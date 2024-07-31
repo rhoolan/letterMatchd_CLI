@@ -109,8 +109,10 @@ async function displayOutput(commonMovies) {
 }
 
 (async () => {
-  const userOne = prompt("Enter the first user's Letterboxd username: ");
-  const userTwo = prompt("Enter the second user's Letterboxd username: ");
+  const userOne = prompt("Enter the first user's Letterboxd username: ").trim();
+  const userTwo = prompt(
+    "Enter the second user's Letterboxd username: ",
+  ).trim();
 
   const watchListOne = await getLetterboxdWatchlist(userOne);
   const watchListTwo = await getLetterboxdWatchlist(userTwo);
