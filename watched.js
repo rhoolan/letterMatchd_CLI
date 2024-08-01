@@ -117,12 +117,11 @@ async function createOutput(sharedTitles, userOneList, userTwoList) {
   const promises = sharedTitles.map(async (title) => {
     const movieUserOne = userOneList.find((movie) => movie.title === title);
     const movieUserTwo = userTwoList.find((movie) => movie.title === title);
-    const tmdbId = await getTMDBNumber(movieUserOne.filmSlug);
-    const tmdbData = await getTMDBData(tmdbId);
+    const posterURL = await getPoster(movieUserOne.filmSlug);
 
     return {
       title,
-      posterUrl: tmdbData.poster_path,
+      posterURL: posterURL,
       userOneRating: movieUserOne.rating,
       userTwoRating: movieUserTwo.rating,
     };
@@ -131,13 +130,31 @@ async function createOutput(sharedTitles, userOneList, userTwoList) {
   return await Promise.all(promises);
 }
 
+// Helper function to get the movies poster
+async function getPoster(filmSlug) {
+  const url = `https://letterboxd.com/film/${filmSlug}`;
+  const filmPage = await fetchPage(url);
+  const $ = cheerio.load(filmPage);
+  const scriptTag = $('script[type="application/ld+json"]').html();
+
+  const regex = /"image":"(https:\/\/[^"]+)"/;
+  const match = scriptTag.match(regex);
+
+  if (match) {
+    const posterURL = match[1];
+    return posterURL;
+  } else {
+    return "Poster not found";
+  }
+}
+
 // Print the output in an easy to read way
 function printOutput(output, userOne, userTwo) {
   for (let i = 0; i < output.length; i++) {
     let title = output[i];
     // console.log(title);
     console.log(
-      `\nTitle: ${title.title}. \n ${title.posterUrl} \n${userOne}: ${title.userOneRating}. \n${userTwo}: ${title.userTwoRating}`,
+      `\nTitle: ${title.title}. \n ${title.posterURL} \n${userOne}: ${title.userOneRating}. \n${userTwo}: ${title.userTwoRating}`,
     );
   }
 }

@@ -3,7 +3,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 
 // URL of the webpage to scrape
-const url = "https://letterboxd.com/furafura/films/page/1"; // Replace with the URL you want to scrape
+const url = "https://letterboxd.com/film/beans-2020"; // Replace with the URL you want to scrape
 
 // Function to fetch HTML from the webpage
 async function fetchHTML(url) {
@@ -31,7 +31,19 @@ async function scrapeHTML() {
 
   // Display the entire HTML of the webpage
   const entireHTML = $.html();
-  console.log(entireHTML);
+  // console.log(entireHTML);
+
+  const scriptTag = $('script[type="application/ld+json"]').html();
+  // console.log(scriptTag);
+  const regex = /"image":"(https:\/\/[^"]+)"/;
+  const match = scriptTag.match(regex);
+
+  if (match) {
+    const ratingValue = match[1];
+    console.log("Poster Url:", ratingValue);
+  } else {
+    console.log("Poster not found");
+  }
 }
 
 // Execute the scrapeHTML function
