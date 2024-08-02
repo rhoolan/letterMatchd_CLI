@@ -1,8 +1,6 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
-const { getTMDBNumber } = require("./getTMDBCode");
-const { getTMDBData } = require("./getTMDBdata");
 
 // Helper delay function
 function delay(ms) {
@@ -81,13 +79,13 @@ async function getLetterboxdWatchlist(username) {
 
     // Proccess each film
     films.each((index, film) => {
-      const titleTag = $(film).find("img");
-      const divTag = $(film).find("div");
+      const title = $(film).find("img").attr("alt");
+      const filmSlug = $(film).find("div").attr("data-film-slug");
       const rating = $(film).find(".rating.-micro.-darker").text().trim();
-      if (titleTag) {
+
+      // Check that the film has a title, if so process
+      if (title) {
         let movie = {};
-        const title = titleTag.attr("alt");
-        const filmSlug = divTag.attr("data-film-slug");
         movie.title = title;
         movie.rating = rating;
         movie.filmSlug = filmSlug;
@@ -154,7 +152,7 @@ function printOutput(output, userOne, userTwo) {
     let title = output[i];
     // console.log(title);
     console.log(
-      `\nTitle: ${title.title}. \n ${title.posterURL} \n${userOne}: ${title.userOneRating}. \n${userTwo}: ${title.userTwoRating}`,
+      `\nTitle: ${title.title}.\n${title.posterURL}\n${userOne}: ${title.userOneRating}.\n${userTwo}: ${title.userTwoRating}`,
     );
   }
 }
@@ -202,7 +200,7 @@ function calculateCompatibility(data) {
   let rating = convertCompatibilityNumberIntoWord(score);
 
   // Return the compatibility score and its descriptive word
-  return `Your compatibility score is ${score} which mean you have a ${rating} compatibility`;
+  return `Your compatibility score is ${score} which mean you have a ${rating} compatibility!`;
 }
 
 // Helper function to convert the numerical compatibility score to a descriptive word
