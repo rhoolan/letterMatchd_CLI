@@ -27,40 +27,38 @@ async function fetchPage(url) {
   }
 }
 
-// Helper function to get the movies poster
-async function getPoster(filmSlug) {
+// Helper function to get info from the FilmPage in one request
+async function getInfoFromFilmPage(filmSlug) {
   const url = `https://letterboxd.com/film/${filmSlug}`;
   const filmPage = await fetchPage(url);
   const $ = cheerio.load(filmPage);
   const scriptTag = $('script[type="application/ld+json"]').html();
 
-  const regex = /"image":"(https:\/\/[^"]+)"/;
-  const match = scriptTag.match(regex);
+  const posterRegex = /"image":"(https:\/\/[^"]+)"/;
+  const posterMatch = scriptTag.match(posterRegex);
 
-  if (match) {
-    const posterURL = match[1];
-    return posterURL;
+  const ratingRegex = /"ratingValue":(\d+\.\d+)/;
+  const ratingMatch = scriptTag.match(ratingRegex);
+
+  let output = [null, null];
+
+  if (posterMatch) {
+    output[0] = posterMatch[1];
   } else {
-    return "Poster not found";
+    output[1] = "Poster not found";
   }
+
+  if (ratingMatch) {
+    output[1] = ratingMatch[1];
+  } else {
+    output[1] = "Rating not found";
+  }
+
+  return output;
 }
 
-// Function to get the average rating of a film from its page
-async function getAverageRating(filmSlug) {
-  const url = `https://letterboxd.com/film/${filmSlug}`;
-  const filmPage = await fetchPage(url);
-  const $ = cheerio.load(filmPage);
-  const scriptTag = $('script[type="application/ld+json"]').html();
-
-  const regex = /"ratingValue":(\d+\.\d+)/;
-  const match = scriptTag.match(regex);
-
-  if (match) {
-    const ratingValue = match[1];
-    return ratingValue;
-  } else {
-    return "Rating Value not found";
-  }
-}
-
-module.exports = { fetchPage, delay, getPoster, getAverageRating };
+module.exports = {
+  fetchPage,
+  delay,
+  getInfoFromFilmPage,
+};

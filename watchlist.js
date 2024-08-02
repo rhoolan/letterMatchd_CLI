@@ -1,10 +1,6 @@
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
-const {
-  fetchPage,
-  getPoster,
-  getAverageRating,
-} = require("./sharedFunctions.js");
+const { fetchPage, getInfoFromFilmPage } = require("./sharedFunctions.js");
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
 async function getPageCount(username) {
@@ -79,10 +75,12 @@ async function displayOutput(commonMovies) {
   for (let i = 0; i < commonMovies.length; i++) {
     const filmName = commonMovies[i][0];
     const filmSlug = commonMovies[i][1];
-    const rating = await getAverageRating(filmSlug);
-    const poster = await getPoster(filmSlug);
+    const filmInfo = await getInfoFromFilmPage(filmSlug);
+    const posterURL = filmInfo[0];
+    const rating = filmInfo[1];
+
     console.log(
-      `Film name: ${filmName} \nLetterBoxd Average User Rating: ${rating}\nPoster: ${poster}`,
+      `Film name: ${filmName} \nLetterBoxd Average User Rating: ${rating}\nPoster: ${posterURL}`,
     );
   }
 }

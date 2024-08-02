@@ -1,6 +1,6 @@
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
-const { fetchPage, getPoster } = require("./sharedFunctions.js");
+const { fetchPage, getInfoFromFilmPage } = require("./sharedFunctions.js");
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
 async function getPageCount(username) {
@@ -89,7 +89,8 @@ async function createOutput(sharedTitles, userOneList, userTwoList) {
   const promises = sharedTitles.map(async (title) => {
     const movieUserOne = userOneList.find((movie) => movie.title === title);
     const movieUserTwo = userTwoList.find((movie) => movie.title === title);
-    const posterURL = await getPoster(movieUserOne.filmSlug);
+    const filmInfo = await getInfoFromFilmPage(movieUserOne.filmSlug);
+    const posterURL = filmInfo[0];
 
     return {
       title,
