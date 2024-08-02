@@ -1,32 +1,6 @@
-const axios = require("axios");
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
-
-// Helper delay function
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-// Helper function to get the HTML from the URL
-async function fetchPage(url) {
-  try {
-    const response = await axios.get(url);
-    return response.data;
-  } catch (error) {
-    if (error.response && error.response.status === 429) {
-      // Catch for if the rate limit is exceeded (Error code 429)
-      // console.error("Rate limit exceeded, Waiting...");
-      // wait for 1 seccond
-      await delay(1000);
-      // retry
-      return fetchPage(url);
-    } else {
-      // Print error and return null for any other error
-      console.error(error);
-      return null;
-    }
-  }
-}
+const { fetchPage, getPoster } = require("./sharedFunctions.js");
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
 async function getPageCount(username) {
@@ -98,7 +72,7 @@ async function getLetterboxdWatchlist(username) {
 }
 
 // Compare the two users film lists
-function compareLists(userOneList, userTwoList) {
+function compareWatchedLists(userOneList, userTwoList) {
   // Filter userOneList to only films that appear in userTwoList
   const sharedTitles = userOneList
     .filter((element1) =>
@@ -126,24 +100,6 @@ async function createOutput(sharedTitles, userOneList, userTwoList) {
   });
 
   return await Promise.all(promises);
-}
-
-// Helper function to get the movies poster
-async function getPoster(filmSlug) {
-  const url = `https://letterboxd.com/film/${filmSlug}`;
-  const filmPage = await fetchPage(url);
-  const $ = cheerio.load(filmPage);
-  const scriptTag = $('script[type="application/ld+json"]').html();
-
-  const regex = /"image":"(https:\/\/[^"]+)"/;
-  const match = scriptTag.match(regex);
-
-  if (match) {
-    const posterURL = match[1];
-    return posterURL;
-  } else {
-    return "Poster not found";
-  }
 }
 
 // Print the output in an easy to read way
@@ -239,6 +195,7 @@ function convertStarRating(rating) {
   return starMap[rating] || 0;
 }
 
+// Main function to run the program
 (async () => {
   let userOne = null;
   let userTwo = null;
@@ -268,7 +225,7 @@ function convertStarRating(rating) {
   }
 
   console.log("Comparing compatibility...");
-  const commonMovies = compareLists(watchListOne, watchListTwo);
+  const commonMovies = compareWatchedLists(watchListOne, watchListTwo);
   let output = await createOutput(
     commonMovies,
     watchListOne,

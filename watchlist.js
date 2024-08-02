@@ -1,16 +1,10 @@
-const axios = require("axios");
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
-
-// Helper function to get the HTML from the URL
-async function fetchPage(url) {
-  try {
-    const repsonse = await axios.get(url);
-    return repsonse.data;
-  } catch (error) {
-    return null;
-  }
-}
+const {
+  fetchPage,
+  getPoster,
+  getAverageRating,
+} = require("./sharedFunctions.js");
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
 async function getPageCount(username) {
@@ -69,25 +63,8 @@ async function getLetterboxdWatchlist(username) {
   return watchlist;
 }
 
-async function getAverageRating(filmSlug) {
-  const url = `https://letterboxd.com/film/${filmSlug}`;
-  const filmPage = await fetchPage(url);
-  const $ = cheerio.load(filmPage);
-  const scriptTag = $('script[type="application/ld+json"]').html();
-
-  const regex = /"ratingValue":(\d+\.\d+)/;
-  const match = scriptTag.match(regex);
-
-  if (match) {
-    const ratingValue = match[1];
-    return ratingValue;
-  } else {
-    return "Rating Value not found";
-  }
-}
-
 // Compare the two users lists
-function compareLists(listOne, listTwo) {
+function compareWatchLists(listOne, listTwo) {
   const commonMovies = listOne.filter((subarray1) =>
     listTwo.some(
       (subarray2) => JSON.stringify(subarray1) === JSON.stringify(subarray2),
@@ -97,17 +74,20 @@ function compareLists(listOne, listTwo) {
   return commonMovies;
 }
 
+// Display the output in the console
 async function displayOutput(commonMovies) {
   for (let i = 0; i < commonMovies.length; i++) {
     const filmName = commonMovies[i][0];
     const filmSlug = commonMovies[i][1];
     const rating = await getAverageRating(filmSlug);
+    const poster = await getPoster(filmSlug);
     console.log(
-      `Film name: ${filmName} \nLetterBoxd Average User Rating: ${rating}\n`,
+      `Film name: ${filmName} \nLetterBoxd Average User Rating: ${rating}\nPoster: ${poster}`,
     );
   }
 }
 
+// Main function to run program
 (async () => {
   const userOne = prompt("Enter the first user's Letterboxd username: ").trim();
   const userTwo = prompt(
@@ -122,6 +102,6 @@ async function displayOutput(commonMovies) {
     return;
   }
 
-  const commonMovies = compareLists(watchListOne, watchListTwo);
+  const commonMovies = compareWatchLists(watchListOne, watchListTwo);
   displayOutput(commonMovies);
 })();
