@@ -1,0 +1,13 @@
+TODO
+
+1. Caching system 
+  - Poster URL - Refresh once a year
+  - Average user rating - Refresh once a day 
+
+2. Tests 
+
+DOING
+
+
+DONE
+
