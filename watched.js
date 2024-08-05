@@ -1,6 +1,13 @@
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
 const { fetchPage, getInfoFromFilmPage } = require("./sharedFunctions.js");
+const { readCacheFile } = require("./caching.js");
+
+// Cache file path
+const filePath = "./posterURLs.txt";
+
+// Global variable for Cache
+let cache = null;
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
 async function getPageCount(username) {
@@ -203,6 +210,9 @@ function convertStarRating(rating) {
   let watchListOne = [];
   let watchListTwo = [];
 
+  // Read in cache
+  cache = await readCacheFile(filePath);
+  console.log(cache);
   while (watchListOne.length === 0) {
     userOne = prompt("Enter the first user's Letterboxd username: ").trim();
     watchListOne = await getLetterboxdWatchlist(userOne);

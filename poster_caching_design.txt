@@ -1,0 +1,34 @@
+Why am I implementing this?
+1. Im assuming it will be faster to scan the TXT file in as an array than it would be to scrape the page.
+2. This should be a solid foundation for caching into a DB when its hosted.
+
+Logic flow 
+==================
+
+make request for poster 
+↓
+check if the poster is in cache 
+↓
+YES  :   Find from cache and server -> Is it expired? YES : Scrape from page NO : Serve
+NO?  :   Scrape from film page and place in cache
+
+
+Caching logic 
+==================
+take film-slug
+↓
+Check if exists in cache or not 
+↓
+YES  :  Pull from cache and serve -> Is it expired? YES : Scrape from page NO : Serve -> END
+NO   :  Scrape the film page for the URL 
+↓
+Create timestamp and expiry date (now + 1 year)
+↓
+place in text file with the following format
+
+{'film-slug', {'posterURL', expiry_date}}
+
+hashmap, store in json
+
+
+

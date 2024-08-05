@@ -1,8 +1,10 @@
 TODO
 
 1. Caching system 
-  - Poster URL - Refresh once a year
-  - Average user rating - Refresh once a day 
+  - Poster URL - Refresh once a year. (Store [Hash, URL, addedDate])
+  - Average user rating - Refresh once a day. (Store [Hash, URL, addedDate])
+  - Users watched list - Refresh every 30 mins.
+  - Users watch list - Refresh every 30 mins.
 
 2. Tests 
 
@@ -11,3 +13,10 @@ DOING
 
 DONE
 
+
+
+CACHE FILE DESIGN 
+
+film_hash : film_slug : poster_url : date_added
+
+{key:value}
