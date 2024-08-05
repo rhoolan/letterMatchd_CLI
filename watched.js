@@ -1,7 +1,7 @@
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
 const { fetchPage, getInfoFromFilmPage } = require("./sharedFunctions.js");
-const { readCacheFile } = require("./caching.js");
+const { readCacheFile, writeToCache } = require("./caching.js");
 
 // Cache file path
 const filePath = "./posterURLs.txt";
@@ -212,7 +212,8 @@ function convertStarRating(rating) {
 
   // Read in cache
   cache = await readCacheFile(filePath);
-  console.log(cache);
+
+  // Get first user and their watchlist
   while (watchListOne.length === 0) {
     userOne = prompt("Enter the first user's Letterboxd username: ").trim();
     watchListOne = await getLetterboxdWatchlist(userOne);
@@ -224,6 +225,7 @@ function convertStarRating(rating) {
     }
   }
 
+  // Get second user and their watchlist
   while (watchListTwo.length === 0) {
     userTwo = prompt("Enter the second user's Letterboxd username: ").trim();
     watchListTwo = await getLetterboxdWatchlist(userTwo);
@@ -247,4 +249,8 @@ function convertStarRating(rating) {
   printOutput(output, userOne, userTwo);
   // show compatibility
   console.log(calculateCompatibility(output));
+
+  //Update Cache
+  writeToCache(filePath, cache);
+  console.log("Data written to cache");
 })();

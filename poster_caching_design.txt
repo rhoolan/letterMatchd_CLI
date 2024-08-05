@@ -32,3 +32,10 @@ hashmap, store in json
 
 
 
+New idea
+=======================
+read in the cache, store as cache 
+any addition to the case will be stored in the hashmap cacheAdditions 
+
+
+
