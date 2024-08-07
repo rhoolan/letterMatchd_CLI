@@ -6,8 +6,7 @@ async function getTMDBData(id) {
     method: "GET",
     headers: {
       accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwZDNkYzI1NzMyMzZlMWEyZWNjZTQ5NDZhZTQ0NmVlNiIsInN1YiI6IjY2NjAxZTRlMGFjOGQ3NzUyNGM5MDk0NyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.D0OMV_tXp5YFBsNGKTzuoFNUbDAOHVgYz4onODOwQJM",
+      Authorization: API,
     },
   };
 

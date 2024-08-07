@@ -1,13 +1,14 @@
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
 const { fetchPage, getInfoFromFilmPage } = require("./sharedFunctions.js");
-const { readCacheFile, writeToCache } = require("./caching.js");
+const {
+  readInCacheFromFile,
+  writeCacheToFile,
+  CacheWithExpiry,
+} = require("./caching.js");
 
 // Cache file path
 const filePath = "./posterURLs.txt";
-
-// Global variable for Cache
-let cache = null;
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
 async function getPageCount(username) {
@@ -91,19 +92,29 @@ function compareWatchedLists(userOneList, userTwoList) {
 }
 
 // Create the output
-async function createOutput(sharedTitles, userOneList, userTwoList) {
+async function createOutput(sharedTitles, userOneList, userTwoList, cache) {
   // Wait for all sharedTitle requests to complete then map
   const promises = sharedTitles.map(async (title) => {
     const movieUserOne = userOneList.find((movie) => movie.title === title);
     const movieUserTwo = userTwoList.find((movie) => movie.title === title);
-    const filmInfo = await getInfoFromFilmPage(movieUserOne.filmSlug);
-    const posterURL = filmInfo[0];
+    // Check cache for movie poster
+    let posterURL = null;
+    let cacheCheck = cache.get(movieUserOne.filmSlug);
+    // console.log(cacheCheck);
+    if (cacheCheck) {
+      posterURL = cacheCheck;
+    } else {
+      const filmInfo = await getInfoFromFilmPage(movieUserOne.filmSlug);
+      posterURL = filmInfo[0];
+      cache.set(movieUserOne.filmSlug, posterURL);
+    }
 
     return {
       title,
       posterURL: posterURL,
       userOneRating: movieUserOne.rating,
       userTwoRating: movieUserTwo.rating,
+      cache: cache,
     };
   });
 
@@ -210,12 +221,16 @@ function convertStarRating(rating) {
   let watchListOne = [];
   let watchListTwo = [];
 
-  // Read in cache
-  cache = await readCacheFile(filePath);
+  // Set new catch that uses expiry date
+  let cache = new CacheWithExpiry();
+
+  // Read in cache from TXT file
+  await readInCacheFromFile(filePath, cache);
 
   // Get first user and their watchlist
   while (watchListOne.length === 0) {
     userOne = prompt("Enter the first user's Letterboxd username: ").trim();
+    console.log(`Getting ${userOne}'s watched list'`);
     watchListOne = await getLetterboxdWatchlist(userOne);
     if (watchListOne.length === 0) {
       console.log(
@@ -228,6 +243,7 @@ function convertStarRating(rating) {
   // Get second user and their watchlist
   while (watchListTwo.length === 0) {
     userTwo = prompt("Enter the second user's Letterboxd username: ").trim();
+    console.log(`Getting ${userTwo}'s watched list'`);
     watchListTwo = await getLetterboxdWatchlist(userTwo);
     if (watchListTwo.length === 0) {
       console.log(
@@ -237,20 +253,25 @@ function convertStarRating(rating) {
     }
   }
 
+  // Compare the watched lists and make new array of common films
   console.log("Comparing compatibility...");
-  const commonMovies = compareWatchedLists(watchListOne, watchListTwo);
+  const commonFilms = compareWatchedLists(watchListOne, watchListTwo);
+  console.log("Creating output...");
+  // Create the output
   let output = await createOutput(
-    commonMovies,
+    commonFilms,
     watchListOne,
     watchListTwo,
-    userOne,
-    userTwo,
+    cache,
   );
+
+  // Print the results
   printOutput(output, userOne, userTwo);
-  // show compatibility
+
+  // Print user compatibility compatibility
+  console.log("Calculating compatibility");
   console.log(calculateCompatibility(output));
 
-  //Update Cache
-  writeToCache(filePath, cache);
-  console.log("Data written to cache");
+  // Write cache to TXT file
+  await writeCacheToFile(filePath, cache);
 })();

@@ -1,11 +1,48 @@
 const fs = require("fs").promises;
 
+// Map class for the cache
+class CacheWithExpiry {
+  constructor() {
+    this.cache = new Map();
+  }
+
+  // Set Key, Value, and expiry date for the current time + 1 year
+  set(key, value, expiryDate = Date.now() + 31536000000) {
+    this.cache.set(key, { value, expiryDate });
+  }
+
+  get(key) {
+    const now = Date.now();
+    const cachedItem = this.cache.get(key);
+
+    if (!cachedItem) {
+      return null;
+    }
+
+    // Check if the cached item is expired
+    if (cachedItem.expiryDate < now) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return cachedItem.value;
+  }
+
+  printCache() {
+    console.log("Cache contents:");
+    this.cache.forEach((value, key) => {
+      console.log(
+        `Key: ${key}, Value: ${value.value}, Expiry Date: ${new Date(value.expiryDate).toLocaleString()}`,
+      );
+    });
+  }
+}
+
 // Function to read the cache file and populate the cache object
-async function readCacheFile(filePath) {
+async function readInCacheFromFile(filePath, cache) {
   try {
     const data = await fs.readFile(filePath, "utf8");
     const lines = data.split("\n");
-    let cache = {};
 
     lines.forEach((line) => {
       const info = line.split(" : ");
@@ -13,7 +50,7 @@ async function readCacheFile(filePath) {
       const posterURL = info[1];
       const expiryDate = info[2];
 
-      cache[filmName] = { posterURL, expiryDate };
+      cache.set(filmName, posterURL, expiryDate);
     });
 
     return cache; // Return the cache here
@@ -23,42 +60,34 @@ async function readCacheFile(filePath) {
   }
 }
 
-// Write the cache to the text file
-function writeToCache(filePath, cache) {
-  // Get size of cache for tracking if an item is the last or not
-  let size = Object.keys(cache).length;
-  let position = 0;
+// Function to write the cache to the txt file
+// CURRENT STATE JUST WRITES BLANK FILE
+async function writeCacheToFile(filePath, cache) {
+  try {
+    // Get the Map object from the CacheWithExpiry instance
+    const cacheMap = cache.cache;
+    // Get size of cache for tracking if an item is the last or not
+    const size = Object.keys(cacheMap).length;
 
-  // Delete all contents of file in preperation for re-writing the cache
-  fs.truncate(filePath, 0, (err) => {
-    if (err) throw err;
-    console.log("File has been cleared");
-  });
+    // Prepare the data to write
+    const data = Array.from(cacheMap.entries())
+      .map(([key, { value, expiryDate }], index) => {
+        // Check if it's the last item, omit the line break
+        return `${key} : ${value} : ${expiryDate}${index !== size - 1 ? "\n" : ""}`;
+      })
+      .join("");
 
-  // Iterate thru all key/value pairs
-  Object.keys(cache).forEach((key) => {
-    position++; // Increment the position for tracking if last object
-    let filmName = key;
-    let filmInfo = cache[key];
-    let posterURL = filmInfo.posterURL;
-    let expiryDate = filmInfo.expiryDate;
-    let data = null;
-    // Check to see if it is the last item in the object. If if is omit the line break
-    // This will stop the file writing strange
-    if (position !== size) {
-      data = `${filmName} : ${posterURL} : ${expiryDate}\n`;
-    } else {
-      data = `${filmName} : ${posterURL} : ${expiryDate}`;
-    }
-
-    fs.appendFile(filePath, data, (err) => {
-      if (err) throw err;
-    });
-  });
+    // Write all data at once
+    await fs.writeFile(filePath, data, "utf8"); // Specify encoding
+    console.log("Data written to cache");
+  } catch (error) {
+    console.error("Failed to write data to cache:", error);
+  }
 }
 
 // Export the readCacheFile function
 module.exports = {
-  readCacheFile,
-  writeToCache,
+  readInCacheFromFile,
+  writeCacheToFile,
+  CacheWithExpiry,
 };
