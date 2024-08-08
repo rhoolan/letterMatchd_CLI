@@ -8,6 +8,10 @@ class CacheWithExpiry {
 
   // Set Key, Value, and expiry date for the current time + 1 year
   set(key, value, expiryDate = Date.now() + 31536000000) {
+    // This if statement prevents an entry that does not have a key. It solves the problem of reading in a   blank file and making an ( null : undefined : time) entry
+    if (!key) {
+      return;
+    }
     this.cache.set(key, { value, expiryDate });
   }
 
@@ -67,7 +71,7 @@ async function writeCacheToFile(filePath, cache) {
     // Get the Map object from the CacheWithExpiry instance
     const cacheMap = cache.cache;
     // Get size of cache for tracking if an item is the last or not
-    const size = Object.keys(cacheMap).length;
+    const size = cacheMap.size;
 
     // Prepare the data to write
     const data = Array.from(cacheMap.entries())
@@ -77,6 +81,7 @@ async function writeCacheToFile(filePath, cache) {
       })
       .join("");
 
+    // console.log(data);
     // Write all data at once
     await fs.writeFile(filePath, data, "utf8"); // Specify encoding
     console.log("Data written to cache");

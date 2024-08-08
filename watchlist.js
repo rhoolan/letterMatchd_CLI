@@ -1,6 +1,15 @@
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
 const { fetchPage, getInfoFromFilmPage } = require("./sharedFunctions.js");
+const {
+  readInCacheFromFile,
+  writeCacheToFile,
+  CacheWithExpiry,
+} = require("./caching.js");
+
+// Cache file path
+const posterURLFilePath = "./posterURLs.txt";
+const averageRatingsFilePath = "./averageRatings.txt";
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
 async function getPageCount(username) {
@@ -71,22 +80,60 @@ function compareWatchLists(listOne, listTwo) {
 }
 
 // Display the output in the console
-async function displayOutput(commonMovies) {
+async function displayOutput(commonMovies, posterCache, ratingCache) {
+  posterCache = posterCache;
+  ratingCache = ratingCache;
+
   for (let i = 0; i < commonMovies.length; i++) {
     const filmName = commonMovies[i][0];
     const filmSlug = commonMovies[i][1];
-    const filmInfo = await getInfoFromFilmPage(filmSlug);
-    const posterURL = filmInfo[0];
-    const rating = filmInfo[1];
+
+    // Set variables for posterURL and Rating
+    let posterURL = null;
+    let averageRating = null;
+
+    // Check cache for movie poster
+    let posterCacheCheck = posterCache.get(filmSlug);
+    // console.log(cacheCheck);
+    if (posterCacheCheck) {
+      posterURL = posterCacheCheck;
+    }
+
+    // Check cache for movie rating
+    let averageRatingCacheCheck = ratingCache.get(filmSlug);
+    // console.log(cacheCheck);
+    if (averageRatingCacheCheck) {
+      averageRating = averageRatingCacheCheck;
+    }
+
+    // If either posterURL or averageRating are null, set both in the cache
+    // Both are scraped from the same request, so its not wasteful to update both at the same time
+    if (!posterURL || !averageRating) {
+      const filmInfo = await getInfoFromFilmPage(filmSlug);
+      posterURL = filmInfo[0];
+      averageRating = filmInfo[1];
+
+      // Set cache
+      posterCache.set(filmSlug, posterURL);
+      ratingCache.set(filmSlug, averageRating);
+    }
 
     console.log(
-      `Film name: ${filmName} \nLetterBoxd Average User Rating: ${rating}\nPoster: ${posterURL}`,
+      `Film name: ${filmName} \nLetterBoxd Average User Rating: ${averageRating}\nPoster: ${posterURL}`,
     );
   }
 }
 
 // Main function to run program
 (async () => {
+  // Set new catch that uses expiry date
+  let posterCache = new CacheWithExpiry();
+  let ratingCache = new CacheWithExpiry();
+
+  // Read in cache from TXT file
+  await readInCacheFromFile(posterURLFilePath, posterCache);
+  await readInCacheFromFile(averageRatingsFilePath, ratingCache);
+
   const userOne = prompt("Enter the first user's Letterboxd username: ").trim();
   const userTwo = prompt(
     "Enter the second user's Letterboxd username: ",
@@ -99,7 +146,9 @@ async function displayOutput(commonMovies) {
     console.error("One of the watchlists is not an array");
     return;
   }
-
   const commonMovies = compareWatchLists(watchListOne, watchListTwo);
-  displayOutput(commonMovies);
+  await displayOutput(commonMovies, posterCache, ratingCache);
+
+  await writeCacheToFile(posterURLFilePath, posterCache);
+  await writeCacheToFile(averageRatingsFilePath, ratingCache);
 })();
