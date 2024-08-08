@@ -172,30 +172,60 @@ function calculateCompatibility(data) {
   let score = denominator === 0 ? 0 : numerator / denominator;
 
   // Convert the numerical compatibility score to a descriptive word
-  let rating = convertCompatibilityNumberIntoWord(score);
+  let rating = convertCorrelationIntoLabel(score);
 
   // Return the compatibility score and its descriptive word
-  return `Your compatibility score is ${score} which mean you have a ${rating} compatibility!`;
+  return `Your compatibility score is ${score}.\n${rating}`;
 }
 
 // Helper function to convert the numerical compatibility score to a descriptive word
-function convertCompatibilityNumberIntoWord(score) {
-  if (score >= 0.0 && score < 0.1) {
-    return "very weak";
-  } else if (score >= 0.1 && score < 0.3) {
-    return "weak";
-  } else if (score >= 0.3 && score < 0.5) {
-    return "moderate";
-  } else if (score >= 0.5 && score < 0.7) {
-    return "strong";
-  } else if (score >= 0.7 && score < 0.9) {
-    return "very strong";
-  } else if (score >= 0.9 && score < 1) {
-    return "nearly perfect";
-  } else if (score === 1) {
-    return "perfect";
+function convertCorrelationIntoLabel(correlation) {
+  if (correlation === 1) {
+    return "Soulmates: Your movie tastes are identical.";
+  } else if (correlation >= 0.9) {
+    return "Peas in a Pod: Almost identical tastes.";
+  } else if (correlation >= 0.8) {
+    return "Great Match: You enjoy many of the same movies.";
+  } else if (correlation >= 0.7) {
+    return "Good Match: You often agree on movie choices.";
+  } else if (correlation >= 0.6) {
+    return "Fairly Similar: Your tastes align on several genres.";
+  } else if (correlation >= 0.5) {
+    return "Decent Match: You share some movie interests.";
+  } else if (correlation >= 0.4) {
+    return "Some Agreement: You like a few similar films.";
+  } else if (correlation >= 0.3) {
+    return "A Little Overlap: Some movies catch both your interests.";
+  } else if (correlation >= 0.2) {
+    return "Mild Overlap: Limited common ground in preferences.";
+  } else if (correlation >= 0.1) {
+    return "Hardly Alike: Minimal shared interests.";
+  } else if (correlation >= 0.0) {
+    return "Worlds Apart: Almost no alignment in tastes.";
+  } else if (correlation >= -0.1) {
+    return "Slightly Different: Just a little bit off.";
+  } else if (correlation >= -0.2) {
+    return "Noticeable Differences: You often have different tastes.";
+  } else if (correlation >= -0.3) {
+    return "Diverging Paths: Tastes are starting to differ.";
+  } else if (correlation >= -0.4) {
+    return "Different Tastes: Your preferences are not aligned.";
+  } else if (correlation >= -0.5) {
+    return "Distinctly Different: Noticeably opposing tastes.";
+  } else if (correlation >= -0.6) {
+    return "Very Different: Movies you like are often not mutual.";
+  } else if (correlation >= -0.7) {
+    return "Opposite Ends: Your choices frequently clash.";
+  } else if (correlation >= -0.8) {
+    return "Polar Opposites: Generally opposing tastes.";
+  } else if (correlation >= -0.9) {
+    return "Almost Completely Opposite: Highly different tastes.";
+  } else if (correlation >= -1.0) {
+    return "At Odds: Nearly complete disagreement in preferences.";
+  } else if (correlation === -1.0) {
+    return "Total Opposites: Complete disagreement in movie tastes.";
   } else {
-    return "Not a valid score";
+    return "Error: Invalid correlation value.";
   }
 }
 

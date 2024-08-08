@@ -8,13 +8,15 @@ class CacheWithExpiry {
 
   // Set Key, Value, and expiry date for the current time + 1 year
   set(key, value, expiryDate = Date.now() + 31536000000) {
-    // This if statement prevents an entry that does not have a key. It solves the problem of reading in a   blank file and making an ( null : undefined : time) entry
+    // This if statement prevents an entry that does not have a key.
+    // It solves the problem of reading in a blank file and making a ( null : undefined : time) entry
     if (!key) {
       return;
     }
     this.cache.set(key, { value, expiryDate });
   }
 
+  // Get data from the cache based on the key (key = film-slug)
   get(key) {
     const now = Date.now();
     const cachedItem = this.cache.get(key);
@@ -23,7 +25,7 @@ class CacheWithExpiry {
       return null;
     }
 
-    // Check if the cached item is expired
+    // Check if the cached item is expired. If expired delete.
     if (cachedItem.expiryDate < now) {
       this.cache.delete(key);
       return null;
