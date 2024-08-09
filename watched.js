@@ -305,5 +305,5 @@ function convertStarRating(rating) {
   console.log(calculateCompatibility(output));
 
   // Write cache to TXT file
-  await writeCacheToFile(filePath, cache);
+  await writeCacheToFile(filePath, cache, "Poster cache");
 })();
