@@ -65,6 +65,7 @@ async function getLetterboxdWatchlist(username) {
     });
   }
 
+  console.log(`${username}'s watchlist successfully retrived'`);
   return watchlist;
 }
 
@@ -139,7 +140,9 @@ async function displayOutput(commonMovies, posterCache, ratingCache) {
     "Enter the second user's Letterboxd username: ",
   ).trim();
 
+  console.log(`Gettings ${userOne}'s watchlist'`);
   const watchListOne = await getLetterboxdWatchlist(userOne);
+  console.log(`Gettings ${userOne}'s watchlist'`);
   const watchListTwo = await getLetterboxdWatchlist(userTwo);
 
   if (!Array.isArray(watchListOne) || !Array.isArray(watchListTwo)) {

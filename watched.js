@@ -76,6 +76,7 @@ async function getLetterboxdWatchlist(username) {
     });
   }
 
+  console.log(`Retrived ${username}'s watched list.`);
   return watchlist;
 }
 
@@ -123,11 +124,12 @@ async function createOutput(sharedTitles, userOneList, userTwoList, cache) {
 
 // Print the output in an easy to read way
 function printOutput(output, userOne, userTwo) {
+  console.log("Printing output");
   for (let i = 0; i < output.length; i++) {
     let title = output[i];
     // console.log(title);
     console.log(
-      `\nTitle: ${title.title}.\n${title.posterURL}\n${userOne}: ${title.userOneRating}.\n${userTwo}: ${title.userTwoRating}`,
+      `\nTitle: ${title.title}\nMovie Poster: ${title.posterURL}\n${userOne} rating : ${title.userOneRating}\n${userTwo} rating: ${title.userTwoRating}`,
     );
   }
 }
@@ -175,7 +177,7 @@ function calculateCompatibility(data) {
   let rating = convertCorrelationIntoLabel(score);
 
   // Return the compatibility score and its descriptive word
-  return `Your compatibility score is ${score}.\n${rating}`;
+  return `\nYour compatibility score is ${score}.\n${rating}`;
 }
 
 // Helper function to convert the numerical compatibility score to a descriptive word
@@ -260,7 +262,7 @@ function convertStarRating(rating) {
   // Get first user and their watchlist
   while (watchListOne.length === 0) {
     userOne = prompt("Enter the first user's Letterboxd username: ").trim();
-    console.log(`Getting ${userOne}'s watched list'`);
+    console.log(`Getting ${userOne}'s watched list...`);
     watchListOne = await getLetterboxdWatchlist(userOne);
     if (watchListOne.length === 0) {
       console.log(
@@ -273,7 +275,7 @@ function convertStarRating(rating) {
   // Get second user and their watchlist
   while (watchListTwo.length === 0) {
     userTwo = prompt("Enter the second user's Letterboxd username: ").trim();
-    console.log(`Getting ${userTwo}'s watched list'`);
+    console.log(`Getting ${userTwo}'s watched list...`);
     watchListTwo = await getLetterboxdWatchlist(userTwo);
     if (watchListTwo.length === 0) {
       console.log(
@@ -299,7 +301,7 @@ function convertStarRating(rating) {
   printOutput(output, userOne, userTwo);
 
   // Print user compatibility compatibility
-  console.log("Calculating compatibility");
+  console.log("\nCalculating compatibility...");
   console.log(calculateCompatibility(output));
 
   // Write cache to TXT file
