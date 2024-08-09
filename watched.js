@@ -8,7 +8,7 @@ const {
 } = require("./caching.js");
 
 // Cache file path
-const filePath = "./posterURLs.txt";
+const filePath = "./posterURLCache.txt";
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
 async function getPageCount(username) {
