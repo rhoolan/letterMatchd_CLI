@@ -68,7 +68,7 @@ async function readInCacheFromFile(filePath, cache) {
 
 // Function to write the cache to the txt file
 // CURRENT STATE JUST WRITES BLANK FILE
-async function writeCacheToFile(filePath, cache) {
+async function writeCacheToFile(filePath, cache, cacheName) {
   try {
     // Get the Map object from the CacheWithExpiry instance
     const cacheMap = cache.cache;
@@ -86,7 +86,7 @@ async function writeCacheToFile(filePath, cache) {
     // console.log(data);
     // Write all data at once
     await fs.writeFile(filePath, data, "utf8"); // Specify encoding
-    console.log("\nData written to cache");
+    console.log(`${cacheName} data written to cache`);
   } catch (error) {
     console.error("Failed to write data to cache:", error);
   }

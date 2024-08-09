@@ -7,3 +7,8 @@ funeral-parade-of-roses : 4.31 : 1754719232663
 merry-christmas-mr-lawrence : 3.91 : 1754719232852
 kaili-blues : 3.93 : 1754719233172
 beans-2020 : 3.61 : 1754719233455
+im-a-cyborg-but-thats-ok : 3.67 : 1754720038065
+the-piano : 3.86 : 1754720038270
+the-farewell-2019 : 4.07 : 1754720038481
+mishima-a-life-in-four-chapters : 4.42 : 1754720038806
+primer : 3.61 : 1754720039092

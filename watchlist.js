@@ -65,7 +65,7 @@ async function getLetterboxdWatchlist(username) {
     });
   }
 
-  console.log(`${username}'s watchlist successfully retrived'`);
+  console.log(`${username}'s watchlist successfully retrived.\n`);
   return watchlist;
 }
 
@@ -120,7 +120,7 @@ async function displayOutput(commonMovies, posterCache, ratingCache) {
     }
 
     console.log(
-      `Film name: ${filmName} \nLetterBoxd Average User Rating: ${averageRating}\nPoster: ${posterURL}`,
+      `Film name: ${filmName} \nLetterBoxd Average User Rating: ${averageRating}\nPoster: ${posterURL} \n`,
     );
   }
 }
@@ -140,18 +140,24 @@ async function displayOutput(commonMovies, posterCache, ratingCache) {
     "Enter the second user's Letterboxd username: ",
   ).trim();
 
-  console.log(`Gettings ${userOne}'s watchlist'`);
+  console.log(`\nGetting ${userOne}'s watchlist...`);
   const watchListOne = await getLetterboxdWatchlist(userOne);
-  console.log(`Gettings ${userOne}'s watchlist'`);
+  console.log(`Getting ${userTwo}'s watchlist`);
   const watchListTwo = await getLetterboxdWatchlist(userTwo);
 
   if (!Array.isArray(watchListOne) || !Array.isArray(watchListTwo)) {
     console.error("One of the watchlists is not an array");
     return;
   }
+  console.log("Comparing watchlists...");
   const commonMovies = compareWatchLists(watchListOne, watchListTwo);
+  console.log("Creating output...\n");
   await displayOutput(commonMovies, posterCache, ratingCache);
 
-  await writeCacheToFile(posterURLFilePath, posterCache);
-  await writeCacheToFile(averageRatingsFilePath, ratingCache);
+  await writeCacheToFile(posterURLFilePath, posterCache, "Poster URL");
+  await writeCacheToFile(
+    averageRatingsFilePath,
+    ratingCache,
+    "Average Ratings",
+  );
 })();
