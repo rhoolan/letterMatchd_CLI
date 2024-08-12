@@ -184,6 +184,8 @@ function calculateCompatibility(data) {
 function convertCorrelationIntoLabel(correlation) {
   if (correlation === 1) {
     return "Soulmates: Your movie tastes are identical.";
+  } else if (correlation > 1.0) {
+    return "Error: Invalid correlation value.";
   } else if (correlation >= 0.9) {
     return "Peas in a Pod: Almost identical tastes.";
   } else if (correlation >= 0.8) {
@@ -202,28 +204,26 @@ function convertCorrelationIntoLabel(correlation) {
     return "Mild Overlap: Limited common ground in preferences.";
   } else if (correlation >= 0.1) {
     return "Hardly Alike: Minimal shared interests.";
-  } else if (correlation >= 0.0) {
+  } else if (correlation > -0.1) {
     return "Worlds Apart: Almost no alignment in tastes.";
-  } else if (correlation >= -0.1) {
+  } else if (correlation > -0.2) {
     return "Slightly Different: Just a little bit off.";
-  } else if (correlation >= -0.2) {
+  } else if (correlation > -0.3) {
     return "Noticeable Differences: You often have different tastes.";
-  } else if (correlation >= -0.3) {
+  } else if (correlation > -0.4) {
     return "Diverging Paths: Tastes are starting to differ.";
-  } else if (correlation >= -0.4) {
+  } else if (correlation > -0.5) {
     return "Different Tastes: Your preferences are not aligned.";
-  } else if (correlation >= -0.5) {
+  } else if (correlation > -0.6) {
     return "Distinctly Different: Noticeably opposing tastes.";
-  } else if (correlation >= -0.6) {
+  } else if (correlation > -0.7) {
     return "Very Different: Movies you like are often not mutual.";
-  } else if (correlation >= -0.7) {
+  } else if (correlation > -0.8) {
     return "Opposite Ends: Your choices frequently clash.";
-  } else if (correlation >= -0.8) {
+  } else if (correlation > -0.9) {
     return "Polar Opposites: Generally opposing tastes.";
-  } else if (correlation >= -0.9) {
+  } else if (correlation > -1) {
     return "Almost Completely Opposite: Highly different tastes.";
-  } else if (correlation >= -1.0) {
-    return "At Odds: Nearly complete disagreement in preferences.";
   } else if (correlation === -1.0) {
     return "Total Opposites: Complete disagreement in movie tastes.";
   } else {
@@ -236,18 +236,20 @@ function convertStarRating(rating) {
   const starMap = {
     "½": 0.5,
     "★": 1,
+    "★½": 1.5,
     "★★": 2,
+    "★★½": 2.5,
     "★★★": 3,
     "★★★½": 3.5,
     "★★★★": 4,
     "★★★★½": 4.5,
     "★★★★★": 5,
   };
-  return starMap[rating] || 0;
+  return starMap[rating] || null;
 }
 
 // Main function to run the program
-(async () => {
+async function main() {
   let userOne = null;
   let userTwo = null;
   let watchListOne = [];
@@ -306,4 +308,13 @@ function convertStarRating(rating) {
 
   // Write cache to TXT file
   await writeCacheToFile(filePath, cache, "Poster cache");
-})();
+}
+
+if (require.main === module) {
+  main(); // This runs only if the script is executed directly
+}
+
+module.exports = {
+  convertStarRating,
+  convertCorrelationIntoLabel,
+};
