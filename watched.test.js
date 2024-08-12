@@ -1,8 +1,40 @@
-// Import the function you want to test
-// const { default: test } = require("node:test");
-const { convertStarRating, convertCorrelationIntoLabel } = require("./watched");
+const {
+  convertStarRating,
+  convertCorrelationIntoLabel,
+  compareWatchedLists,
+  createOutput,
+} = require("./watched");
 
-// convertCorrelationIntoLabel.test.js
+const { getInfoFromFilmPage } = require("./sharedFunctions");
+
+jest.mock("./sharedFunctions", () => ({
+  getInfoFromFilmPage: jest.fn(),
+}));
+
+describe("convertStarRating", () => {
+  // Test case for recognized ratings
+  it("should convert star ratings to numbers", () => {
+    // Test expectations
+    expect(convertStarRating("½")).toBe(0.5);
+    expect(convertStarRating("★")).toBe(1);
+    expect(convertStarRating("★½")).toBe(1.5);
+    expect(convertStarRating("★★")).toBe(2);
+    expect(convertStarRating("★★½")).toBe(2.5);
+    expect(convertStarRating("★★★")).toBe(3);
+    expect(convertStarRating("★★★½")).toBe(3.5);
+    expect(convertStarRating("★★★★")).toBe(4);
+    expect(convertStarRating("★★★★½")).toBe(4.5);
+    expect(convertStarRating("★★★★★")).toBe(5);
+  });
+
+  // Test case for unrecognized ratings
+  it("should return null for unrecognized ratings", () => {
+    // Test expectations
+    expect(convertStarRating("Unknown")).toBe(null);
+    expect(convertStarRating("")).toBe(null); // Test for empty string
+    expect(convertStarRating("★★★★★★")).toBe(null); // Test for unrecognized pattern
+  });
+});
 
 describe("convertCorrelationIntoLabel", () => {
   it('returns "Soulmates" when correlation is 1', () => {
@@ -119,7 +151,6 @@ describe("convertCorrelationIntoLabel", () => {
     );
   });
 
-  //
   it('returns "Worlds Apart: Almost no alignment in tastes." when correlation is 0.0', () => {
     expect(convertCorrelationIntoLabel(0.0)).toBe(
       "Worlds Apart: Almost no alignment in tastes.",
@@ -131,7 +162,7 @@ describe("convertCorrelationIntoLabel", () => {
       "Worlds Apart: Almost no alignment in tastes.",
     );
   });
-  //
+
   it('returns "Slightly Different: Just a little bit off." when correlation is -0.1', () => {
     expect(convertCorrelationIntoLabel(-0.1)).toBe(
       "Slightly Different: Just a little bit off.",
@@ -143,7 +174,7 @@ describe("convertCorrelationIntoLabel", () => {
       "Slightly Different: Just a little bit off.",
     );
   });
-  //
+
   it('returns "Noticeable Differences: You often have different tastes." when correlation is -0.2', () => {
     expect(convertCorrelationIntoLabel(-0.2)).toBe(
       "Noticeable Differences: You often have different tastes.",
@@ -155,7 +186,7 @@ describe("convertCorrelationIntoLabel", () => {
       "Noticeable Differences: You often have different tastes.",
     );
   });
-  //
+
   it('returns "Diverging Paths: Tastes are starting to differ." when correlation is -0.3', () => {
     expect(convertCorrelationIntoLabel(-0.3)).toBe(
       "Diverging Paths: Tastes are starting to differ.",
@@ -167,7 +198,7 @@ describe("convertCorrelationIntoLabel", () => {
       "Diverging Paths: Tastes are starting to differ.",
     );
   });
-  //
+
   it('returns "Different Tastes: Your preferences are not aligned." when correlation is -0.4', () => {
     expect(convertCorrelationIntoLabel(-0.4)).toBe(
       "Different Tastes: Your preferences are not aligned.",
@@ -179,7 +210,7 @@ describe("convertCorrelationIntoLabel", () => {
       "Different Tastes: Your preferences are not aligned.",
     );
   });
-  //
+
   it('returns "Distinctly Different: Noticeably opposing tastes." when correlation is -0.4', () => {
     expect(convertCorrelationIntoLabel(-0.5)).toBe(
       "Distinctly Different: Noticeably opposing tastes.",
@@ -191,7 +222,7 @@ describe("convertCorrelationIntoLabel", () => {
       "Distinctly Different: Noticeably opposing tastes.",
     );
   });
-  //
+
   it('returns "Very Different: Movies you like are often not mutual." when correlation is -0.6', () => {
     expect(convertCorrelationIntoLabel(-0.6)).toBe(
       "Very Different: Movies you like are often not mutual.",
@@ -246,8 +277,6 @@ describe("convertCorrelationIntoLabel", () => {
     );
   });
 
-  //
-
   it('returns "Error: Invalid correlation value." when correlation is not within the range -1.0 to 1.0', () => {
     expect(convertCorrelationIntoLabel(1.1)).toBe(
       "Error: Invalid correlation value.",
@@ -258,28 +287,174 @@ describe("convertCorrelationIntoLabel", () => {
   });
 });
 
-// Describe the test suite
-describe("convertStarRating", () => {
-  // Test case for recognized ratings
-  it("should convert star ratings to numbers", () => {
-    // Test expectations
-    expect(convertStarRating("½")).toBe(0.5);
-    expect(convertStarRating("★")).toBe(1);
-    expect(convertStarRating("★½")).toBe(1.5);
-    expect(convertStarRating("★★")).toBe(2);
-    expect(convertStarRating("★★½")).toBe(2.5);
-    expect(convertStarRating("★★★")).toBe(3);
-    expect(convertStarRating("★★★½")).toBe(3.5);
-    expect(convertStarRating("★★★★")).toBe(4);
-    expect(convertStarRating("★★★★½")).toBe(4.5);
-    expect(convertStarRating("★★★★★")).toBe(5);
+describe("compareWatchedLists", () => {
+  it("should return shared titles between two users", () => {
+    const userOneList = [
+      { title: "One" },
+      { title: "Two" },
+      { title: "Three" },
+    ];
+
+    const userTwoList = [{ title: "One" }, { title: "Two" }, { title: "Four" }];
+
+    const expectedSharedTitles = ["One", "Two"];
+
+    const result = compareWatchedLists(userOneList, userTwoList);
+
+    expect(result).toEqual(expectedSharedTitles);
   });
 
-  // Test case for unrecognized ratings
-  it("should return null for unrecognized ratings", () => {
-    // Test expectations
-    expect(convertStarRating("Unknown")).toBe(null);
-    expect(convertStarRating("")).toBe(null); // Test for empty string
-    expect(convertStarRating("★★★★★★")).toBe(null); // Test for unrecognized pattern
+  it("should return an empty array if no titles are shared", () => {
+    const userOneList = [{ title: "One" }];
+    const userTwoList = [{ title: "Two" }];
+
+    const expectedSharedTitles = [];
+
+    const result = compareWatchedLists(userOneList, userTwoList);
+
+    expect(result).toEqual(expectedSharedTitles);
+  });
+
+  it("should return all titles if both arrays are identical", () => {
+    const userOneList = [
+      { title: "One" },
+      { title: "Two" },
+      { title: "Three" },
+    ];
+
+    const userTwoList = [
+      { title: "One" },
+      { title: "Two" },
+      { title: "Three" },
+    ];
+
+    const expectedResults = ["One", "Two", "Three"];
+
+    const result = compareWatchedLists(userOneList, userTwoList);
+
+    expect(result).toEqual(expectedResults);
+  });
+});
+
+describe("createOutput", () => {
+  const sharedTitles = ["Movie A", "Movie B"];
+  const userOneList = [
+    { title: "Movie A", rating: 4, filmSlug: "movie-A" },
+    { title: "Movie B", rating: 5, filmSlug: "movie-B" },
+  ];
+  const userTwoList = [
+    { title: "Movie A", rating: 4, filmSlug: "movie-A" },
+    { title: "Movie B", rating: 3, filmSlug: "movie-B" },
+  ];
+  let cache;
+
+  beforeEach(() => {
+    cache = new Map();
+    getInfoFromFilmPage.mockReset();
+  });
+
+  it("should return correct output when cache is empty", async () => {
+    // Mock the getInfoFromFilmPage to return different poster URLs based on input
+    getInfoFromFilmPage
+      .mockImplementationOnce(() => Promise.resolve(["poster-url-a"]))
+      .mockImplementationOnce(() => Promise.resolve(["poster-url-b"]));
+
+    // Call createOutput
+    const result = await createOutput(
+      sharedTitles,
+      userOneList,
+      userTwoList,
+      cache,
+    );
+
+    // Check the result
+    expect(result).toEqual([
+      {
+        title: "Movie A",
+        posterURL: "poster-url-a",
+        userOneRating: 4,
+        userTwoRating: 4,
+        cache: expect.any(Map),
+      },
+      {
+        title: "Movie B",
+        posterURL: "poster-url-b",
+        userOneRating: 5,
+        userTwoRating: 3,
+        cache: expect.any(Map),
+      },
+    ]);
+
+    // Ensure the cache is populated correctly
+    expect(cache.get("movie-A")).toBe("poster-url-a");
+    expect(cache.get("movie-B")).toBe("poster-url-b");
+  });
+
+  it("should return correct output when all titles are in the cache", async () => {
+    cache.set("movie-A", "poster-url-a");
+    cache.set("movie-B", "poster-url-b");
+
+    const result = await createOutput(
+      sharedTitles,
+      userOneList,
+      userTwoList,
+      cache,
+    );
+
+    // Assertions
+    expect(result).toEqual([
+      {
+        title: "Movie A",
+        posterURL: "poster-url-a",
+        userOneRating: 4,
+        userTwoRating: 4,
+        cache: expect.any(Map),
+      },
+      {
+        title: "Movie B",
+        posterURL: "poster-url-b",
+        userOneRating: 5,
+        userTwoRating: 3,
+        cache: expect.any(Map),
+      },
+    ]);
+    expect(getInfoFromFilmPage).not.toHaveBeenCalled();
+  });
+
+  it("should return handle missing Poster URLs gracefully", async () => {
+    // Mock the getInfoFromFilmPage to return different poster URLs based on input
+    getInfoFromFilmPage
+      .mockImplementationOnce(() => Promise.resolve(["Poster not found"]))
+      .mockImplementationOnce(() => Promise.resolve(["poster-url-b"]));
+
+    // Call createOutput
+    const result = await createOutput(
+      sharedTitles,
+      userOneList,
+      userTwoList,
+      cache,
+    );
+
+    // Check the result
+    expect(result).toEqual([
+      {
+        title: "Movie A",
+        posterURL: "Poster not found",
+        userOneRating: 4,
+        userTwoRating: 4,
+        cache: expect.any(Map),
+      },
+      {
+        title: "Movie B",
+        posterURL: "poster-url-b",
+        userOneRating: 5,
+        userTwoRating: 3,
+        cache: expect.any(Map),
+      },
+    ]);
+
+    // Ensure the cache is populated correctly
+    expect(cache.get("movie-A")).toBe("Poster not found");
+    expect(cache.get("movie-B")).toBe("poster-url-b");
   });
 });

@@ -317,4 +317,6 @@ if (require.main === module) {
 module.exports = {
   convertStarRating,
   convertCorrelationIntoLabel,
+  compareWatchedLists,
+  createOutput,
 };
