@@ -144,11 +144,16 @@ function calculateCompatibility(data) {
     .map((movie) => movie.userTwoRating)
     .map((rating) => convertStarRating(rating)); // Convert star rating to a numerical rating
 
+  // Filter both arrays to remove movies where one user has not rated it.
+  let filteredUserRatings = filterUserRatings(userOneRatings, userTwoRatings);
+  let filteredUserOneRatings = filteredUserRatings[0];
+  let filteredUserTwoRatings = filteredUserRatings[1];
+  
   // Calcuate the mean rating for each user
   let userOneMean =
-    userOneRatings.reduce((a, b) => a + b, 0) / userOneRatings.length;
+    filteredUserOneRatings.reduce((a, b) => a + b, 0) / filteredUserOneRatings.length;
   let userTwoMean =
-    userTwoRatings.reduce((a, b) => a + b, 0) / userTwoRatings.length;
+    filteredUserTwoRatings.reduce((a, b) => a + b, 0) / filteredUserTwoRatings.length;
 
   // Calculate the numerator for the Pearson correlation coefficient
   let numerator = data.reduce((acc, movie) => {
@@ -158,11 +163,11 @@ function calculateCompatibility(data) {
   }, 0);
 
   // Calculate the variance for each user's ratings
-  let userOneVariance = userOneRatings.reduce(
+  let userOneVariance = filteredUserOneRatings.reduce(
     (acc, rating) => acc + Math.pow(rating - userOneMean, 2),
     0,
   );
-  let userTwoVariance = userTwoRatings.reduce(
+  let userTwoVariance = filteredUserTwoRatings.reduce(
     (acc, rating) => acc + Math.pow(rating - userTwoMean, 2),
     0,
   );
