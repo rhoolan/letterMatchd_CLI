@@ -10,7 +10,7 @@ const {
 // Cache file path
 const filePath = "./posterURLCache.txt";
 
-// Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist)
+// Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist). :INTERGRATION TEST NEEDED
 async function getPageCount(username) {
   try {
     const url = `https://letterboxd.com/${username}/films`;
@@ -27,7 +27,7 @@ async function getPageCount(username) {
   }
 }
 
-// Get the users watched film list
+// Get the users watched film list. :INTERGRATION TEST NEEDED
 async function getLetterboxdWatchlist(username) {
   let watchlist = [];
   let page = 1;
@@ -80,7 +80,7 @@ async function getLetterboxdWatchlist(username) {
   return watchlist;
 }
 
-// Compare the two users film lists
+// Compare the two users film lists. :UNIT TESTS DONE
 function compareWatchedLists(userOneList, userTwoList) {
   // Filter userOneList to only films that appear in userTwoList
   const sharedTitles = userOneList
@@ -92,7 +92,7 @@ function compareWatchedLists(userOneList, userTwoList) {
   return sharedTitles;
 }
 
-// Create the output
+// Create the output. :UNIT TESTS DONE
 async function createOutput(sharedTitles, userOneList, userTwoList, cache) {
   // Wait for all sharedTitle requests to complete then map
   const promises = sharedTitles.map(async (title) => {
@@ -122,7 +122,7 @@ async function createOutput(sharedTitles, userOneList, userTwoList, cache) {
   return await Promise.all(promises);
 }
 
-// Print the output in an easy to read way
+// Print the output in an easy to read way. :UNIT TESTS DONE
 function printOutput(output, userOne, userTwo) {
   console.log("Printing output");
   for (let i = 0; i < output.length; i++) {
@@ -134,7 +134,7 @@ function printOutput(output, userOne, userTwo) {
   }
 }
 
-// Calculate the users compatibility using the Pearson correlation coefficient
+// Calculate the users compatibility using the Pearson correlation coefficient.
 function calculateCompatibility(data) {
   // Extract and convert user ratings from the data
   let userOneRatings = data
@@ -180,7 +180,22 @@ function calculateCompatibility(data) {
   return `\nYour compatibility score is ${score}.\n${rating}`;
 }
 
-// Helper function to convert the numerical compatibility score to a descriptive word
+// Filter the two arrays and remove any elements from both arrays when there is a null/no rating from one user.
+function filterUserRatings(userOneRatings, userTwoRatings) {
+  let filteredUserOneRatings = [];
+  let filteredUserTwoRatings = [];
+
+  for (let i = 0; i < userOneRatings.length; i++) {
+    if (userOneRatings[i] !== 0 && userTwoRatings[i] !== 0) {
+      filteredUserOneRatings.push(userOneRatings[i]);
+      filteredUserTwoRatings.push(userTwoRatings[i]);
+    }
+  }
+
+  return [filteredUserOneRatings, filteredUserTwoRatings];
+}
+
+// Helper function to convert the numerical compatibility score to a descriptive word. UNIT TESTS DONE
 function convertCorrelationIntoLabel(correlation) {
   if (correlation === 1) {
     return "Soulmates: Your movie tastes are identical.";
@@ -231,7 +246,7 @@ function convertCorrelationIntoLabel(correlation) {
   }
 }
 
-// Helper function to convert star ratings to a numerical scale
+// Helper function to convert star ratings to a numerical scale. UNIT TESTS DONE
 function convertStarRating(rating) {
   const starMap = {
     "½": 0.5,
@@ -319,4 +334,6 @@ module.exports = {
   convertCorrelationIntoLabel,
   compareWatchedLists,
   createOutput,
+  printOutput,
+  filterUserRatings,
 };

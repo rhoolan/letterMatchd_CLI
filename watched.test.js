@@ -3,6 +3,8 @@ const {
   convertCorrelationIntoLabel,
   compareWatchedLists,
   createOutput,
+  printOutput,
+  filterUserRatings,
 } = require("./watched");
 
 const { getInfoFromFilmPage } = require("./sharedFunctions");
@@ -456,5 +458,63 @@ describe("createOutput", () => {
     // Ensure the cache is populated correctly
     expect(cache.get("movie-A")).toBe("Poster not found");
     expect(cache.get("movie-B")).toBe("poster-url-b");
+  });
+});
+
+describe("printOutput", () => {
+  // Mock console.log
+  beforeEach(() => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  // Restore console.log after each test
+  afterEach(() => {
+    console.log.mockRestore();
+  });
+
+  it("should print the output in a readable format", () => {
+    const output = [
+      {
+        title: "Movie A",
+        posterURL: "poster-url-a",
+        userOneRating: 4,
+        userTwoRating: 5,
+      },
+      {
+        title: "Movie B",
+        posterURL: "poster-url-b",
+        userOneRating: 5,
+        userTwoRating: 4,
+      },
+    ];
+    const userOne = "User One";
+    const userTwo = "User Two";
+
+    // Call the function
+    printOutput(output, userOne, userTwo);
+
+    // Check the expected console.log calls
+    expect(console.log).toHaveBeenCalledWith("Printing output");
+    expect(console.log).toHaveBeenCalledWith(
+      `\nTitle: Movie A\nMovie Poster: poster-url-a\nUser One rating : 4\nUser Two rating: 5`,
+    );
+    expect(console.log).toHaveBeenCalledWith(
+      `\nTitle: Movie B\nMovie Poster: poster-url-b\nUser One rating : 5\nUser Two rating: 4`,
+    );
+  });
+});
+
+describe("filterUserRatings", () => {
+  const userOneRatings = [5, 4, 3, 2, 0];
+  const userTwoRatings = [0, 4, 3, 2, 1];
+
+  const expectedResults = [
+    [4, 3, 2],
+    [4, 3, 2],
+  ];
+  const results = filterUserRatings(userOneRatings, userTwoRatings);
+
+  it("should filter out elements where either is 0", () => {
+    expect(results).toEqual(expectedResults);
   });
 });
