@@ -505,7 +505,7 @@ describe("printOutput", () => {
 });
 
 describe("calculateCompatibility", () => {
-  it("Calc for good data", () => {
+  it("Calculate for data where all films have ratings from both users", () => {
     const data = [
       {
         title: "MaXXXine",
@@ -540,7 +540,7 @@ describe("calculateCompatibility", () => {
     expect(result).toEqual(expectedResult);
   });
 
-  it("Calc for bad data", () => {
+  it("Calculates for data where one film only has a rating from one user", () => {
     const data = [
       {
         title: "MaXXXine",

@@ -6,7 +6,7 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Helper function to get the HTML from the URL
+// Helper function to get the HTML from the URL. :INTERGRATION TEST NEEDED
 async function fetchPage(url) {
   try {
     const response = await axios.get(url);
@@ -27,7 +27,7 @@ async function fetchPage(url) {
   }
 }
 
-// Helper function to get info from the FilmPage in one request
+// Helper function to get info from the FilmPage in one request. INTERGRATION TEST NEEDED
 async function getInfoFromFilmPage(filmSlug) {
   const url = `https://letterboxd.com/film/${filmSlug}`;
   const filmPage = await fetchPage(url);
