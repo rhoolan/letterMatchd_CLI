@@ -86,7 +86,7 @@ async function writeCacheToFile(filePath, cache, cacheName) {
     // console.log(data);
     // Write all data at once
     await fs.writeFile(filePath, data, "utf8"); // Specify encoding
-    console.log(`${cacheName} data written to cache`);
+    console.log(`\n${cacheName} data written to cache`);
   } catch (error) {
     console.error("Failed to write data to cache:", error);
   }
