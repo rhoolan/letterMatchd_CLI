@@ -137,7 +137,7 @@ function printOutput(output, userOne, userTwo) {
 // Calculate the users compatibility using the Pearson correlation coefficient.
 function calculateCompatibility(data) {
   // Filter the data to remove any movies where one user has not rated. This prevents the algorithm from processing that user's rating for the movie as a 0.
-g  const filteredData = data.filter(
+  const filteredData = data.filter(
     (movie) => movie.userOneRating !== "" && movie.userTwoRating !== "",
   );
   // console.log(filteredData);
