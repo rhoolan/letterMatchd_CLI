@@ -4,7 +4,7 @@ const {
   compareWatchedLists,
   createOutput,
   printOutput,
-  filterUserRatings,
+  calculateCompatibility,
 } = require("./watched");
 
 const { getInfoFromFilmPage } = require("./sharedFunctions");
@@ -504,17 +504,94 @@ describe("printOutput", () => {
   });
 });
 
-describe("filterUserRatings", () => {
-  const userOneRatings = [5, 4, 3, 2, 0];
-  const userTwoRatings = [0, 4, 3, 2, 1];
+// describe("filterUserRatings", () => {
+//   const userOneRatings = [5, 4, 3, 2, null];
+//   const userTwoRatings = [null, 4, 3, 2, 1];
 
-  const expectedResults = [
-    [4, 3, 2],
-    [4, 3, 2],
-  ];
-  const results = filterUserRatings(userOneRatings, userTwoRatings);
+//   const expectedResults = [
+//     [4, 3, 2],
+//     [4, 3, 2],
+//   ];
+//   const results = filterUserRatings(userOneRatings, userTwoRatings);
 
-  it("should filter out elements where either is 0", () => {
-    expect(results).toEqual(expectedResults);
+//   it("should filter out elements where either is 0", () => {
+//     expect(results).toEqual(expectedResults);
+//   });
+// // });
+
+describe("calculateCompatibility", () => {
+  it("Calc for good data", () => {
+    const data = [
+      {
+        title: "MaXXXine",
+        userOneRating: "★★★",
+        userTwoRating: "★★★",
+      },
+      {
+        title: "The Fall Guy",
+        userOneRating: "★★★",
+        userTwoRating: "★★★★",
+      },
+      {
+        title: "Dune: Part Two",
+        userOneRating: "★★★",
+        userTwoRating: "★★★★",
+      },
+      {
+        title: "Expats",
+        userOneRating: "★★★",
+        userTwoRating: "★★★★",
+      },
+      {
+        title: "Love Lies Bleeding",
+        userOneRating: "★★★½",
+        userTwoRating: "★★★★",
+      },
+    ];
+
+    const result = calculateCompatibility(data);
+
+    const expectedResult = `\nYour compatibility score is 0.25.\nMild Overlap: Limited common ground in preferences.`;
+    expect(result).toEqual(expectedResult);
+  });
+
+  it("Calc for bad data", () => {
+    const data = [
+      {
+        title: "MaXXXine",
+        userOneRating: "★★★",
+        userTwoRating: "★★★",
+      },
+      {
+        title: "The Fall Guy",
+        userOneRating: "★★★",
+        userTwoRating: "★★★★",
+      },
+      {
+        title: "Dune: Part Two",
+        userOneRating: "★★★",
+        userTwoRating: "★★★★",
+      },
+      {
+        title: "Expats",
+        userOneRating: "★★★",
+        userTwoRating: "★★★★",
+      },
+      {
+        title: "Love Lies Bleeding",
+        userOneRating: "★★★½",
+        userTwoRating: "★★★★",
+      },
+      {
+        title: "The Fall Guy",
+        userOneRating: "",
+        userTwoRating: "★★★★",
+      },
+    ];
+
+    const result = calculateCompatibility(data);
+
+    const expectedResult = `\nYour compatibility score is 0.25.\nMild Overlap: Limited common ground in preferences.`;
+    expect(result).toEqual(expectedResult);
   });
 });

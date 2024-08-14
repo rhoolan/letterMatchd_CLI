@@ -136,38 +136,40 @@ function printOutput(output, userOne, userTwo) {
 
 // Calculate the users compatibility using the Pearson correlation coefficient.
 function calculateCompatibility(data) {
+  // Filter the data to remove any movies where one user has not rated. This prevents the algorithm from processing that user's rating for the movie as a 0.
+  console.log(data);
+  const filteredData = data.filter(
+    (movie) => movie.userOneRating !== "" && movie.userTwoRating !== "",
+  );
+  // console.log(filteredData);
   // Extract and convert user ratings from the data
-  let userOneRatings = data
+  let userOneRatings = filteredData
     .map((movie) => movie.userOneRating)
     .map((rating) => convertStarRating(rating)); // Convert star rating to a numerical rating
-  let userTwoRatings = data
+  let userTwoRatings = filteredData
     .map((movie) => movie.userTwoRating)
     .map((rating) => convertStarRating(rating)); // Convert star rating to a numerical rating
 
-  // Filter both arrays to remove movies where one user has not rated it.
-  let filteredUserRatings = filterUserRatings(userOneRatings, userTwoRatings);
-  let filteredUserOneRatings = filteredUserRatings[0];
-  let filteredUserTwoRatings = filteredUserRatings[1];
-  
   // Calcuate the mean rating for each user
   let userOneMean =
-    filteredUserOneRatings.reduce((a, b) => a + b, 0) / filteredUserOneRatings.length;
+    userOneRatings.reduce((a, b) => a + b, 0) / userOneRatings.length;
   let userTwoMean =
-    filteredUserTwoRatings.reduce((a, b) => a + b, 0) / filteredUserTwoRatings.length;
+    userTwoRatings.reduce((a, b) => a + b, 0) / userTwoRatings.length;
 
   // Calculate the numerator for the Pearson correlation coefficient
-  let numerator = data.reduce((acc, movie) => {
+  let numerator = filteredData.reduce((acc, movie) => {
     let userOneRating = convertStarRating(movie.userOneRating);
     let userTwoRating = convertStarRating(movie.userTwoRating);
+
     return acc + (userOneRating - userOneMean) * (userTwoRating - userTwoMean);
   }, 0);
 
   // Calculate the variance for each user's ratings
-  let userOneVariance = filteredUserOneRatings.reduce(
+  let userOneVariance = userOneRatings.reduce(
     (acc, rating) => acc + Math.pow(rating - userOneMean, 2),
     0,
   );
-  let userTwoVariance = filteredUserTwoRatings.reduce(
+  let userTwoVariance = userTwoRatings.reduce(
     (acc, rating) => acc + Math.pow(rating - userTwoMean, 2),
     0,
   );
@@ -176,28 +178,15 @@ function calculateCompatibility(data) {
   let denominator = Math.sqrt(userOneVariance * userTwoVariance);
 
   // Calculate the compatibility score
-  let score = denominator === 0 ? 0 : numerator / denominator;
+  let rawScore = denominator === 0 ? 0 : numerator / denominator;
+  // Convert to two decimal places for easier viewing
+  let score = Math.round(rawScore * 100) / 100;
 
   // Convert the numerical compatibility score to a descriptive word
   let rating = convertCorrelationIntoLabel(score);
 
   // Return the compatibility score and its descriptive word
   return `\nYour compatibility score is ${score}.\n${rating}`;
-}
-
-// Filter the two arrays and remove any elements from both arrays when there is a null/no rating from one user.
-function filterUserRatings(userOneRatings, userTwoRatings) {
-  let filteredUserOneRatings = [];
-  let filteredUserTwoRatings = [];
-
-  for (let i = 0; i < userOneRatings.length; i++) {
-    if (userOneRatings[i] !== 0 && userTwoRatings[i] !== 0) {
-      filteredUserOneRatings.push(userOneRatings[i]);
-      filteredUserTwoRatings.push(userTwoRatings[i]);
-    }
-  }
-
-  return [filteredUserOneRatings, filteredUserTwoRatings];
 }
 
 // Helper function to convert the numerical compatibility score to a descriptive word. UNIT TESTS DONE
@@ -319,6 +308,8 @@ async function main() {
     cache,
   );
 
+  console.log(output);
+
   // Print the results
   printOutput(output, userOne, userTwo);
 
@@ -340,5 +331,5 @@ module.exports = {
   compareWatchedLists,
   createOutput,
   printOutput,
-  filterUserRatings,
+  calculateCompatibility,
 };
