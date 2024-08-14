@@ -307,8 +307,6 @@ async function main() {
     cache,
   );
 
-  console.log(output);
-
   // Print the results
   printOutput(output, userOne, userTwo);
 
