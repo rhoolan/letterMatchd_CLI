@@ -134,7 +134,7 @@ function printOutput(output, userOne, userTwo) {
   }
 }
 
-// Calculate the users compatibility using the Pearson correlation coefficient.
+// Calculate the users compatibility using the Pearson correlation coefficient. :UNIT TESTS DONE
 function calculateCompatibility(data) {
   // Filter the data to remove any movies where one user has not rated. This prevents the algorithm from processing that user's rating for the movie as a 0.
   const filteredData = data.filter(
