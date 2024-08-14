@@ -504,21 +504,6 @@ describe("printOutput", () => {
   });
 });
 
-// describe("filterUserRatings", () => {
-//   const userOneRatings = [5, 4, 3, 2, null];
-//   const userTwoRatings = [null, 4, 3, 2, 1];
-
-//   const expectedResults = [
-//     [4, 3, 2],
-//     [4, 3, 2],
-//   ];
-//   const results = filterUserRatings(userOneRatings, userTwoRatings);
-
-//   it("should filter out elements where either is 0", () => {
-//     expect(results).toEqual(expectedResults);
-//   });
-// // });
-
 describe("calculateCompatibility", () => {
   it("Calc for good data", () => {
     const data = [
