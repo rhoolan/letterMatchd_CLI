@@ -1,5 +1,9 @@
 const axios = require("axios");
+const axiosRetry = require("axios-retry").default;
 const cheerio = require("cheerio");
+
+// Axios retry logic
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 // Helper delay function
 function delay(ms) {
