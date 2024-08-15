@@ -1,5 +1,3 @@
-//
-
 const cheerio = require("cheerio");
 const prompt = require("prompt-sync")();
 const { fetchPage, getInfoFromFilmPage } = require("./sharedFunctions.js");
@@ -8,6 +6,9 @@ const {
   writeCacheToFile,
   CacheWithExpiry,
 } = require("./caching.js");
+
+// pMap for handling huge lists
+const pLimit = require("p-limit");
 
 // Cache file path
 const filePath = "./posterURLCache.txt";
@@ -96,30 +97,34 @@ function compareWatchedLists(userOneList, userTwoList) {
 
 // Create the output. :UNIT TESTS DONE
 async function createOutput(sharedTitles, userOneList, userTwoList, cache) {
-  // Wait for all sharedTitle requests to complete then map
-  const promises = sharedTitles.map(async (title) => {
-    const movieUserOne = userOneList.find((movie) => movie.title === title);
-    const movieUserTwo = userTwoList.find((movie) => movie.title === title);
-    // Check cache for movie poster
-    let posterURL = null;
-    let cacheCheck = cache.get(movieUserOne.filmSlug);
-    // console.log(cacheCheck);
-    if (cacheCheck) {
-      posterURL = cacheCheck;
-    } else {
-      const filmInfo = await getInfoFromFilmPage(movieUserOne.filmSlug);
-      posterURL = filmInfo[0];
-      cache.set(movieUserOne.filmSlug, posterURL);
-    }
+  // Create a limit function that allows up to 10 concurrent requests
+  const limit = pLimit(10);
 
-    return {
-      title,
-      posterURL: posterURL,
-      userOneRating: movieUserOne.rating,
-      userTwoRating: movieUserTwo.rating,
-      cache: cache,
-    };
-  });
+  const promises = sharedTitles.map((title) =>
+    limit(async () => {
+      const movieUserOne = userOneList.find((movie) => movie.title === title);
+      const movieUserTwo = userTwoList.find((movie) => movie.title === title);
+
+      // Check cache for movie poster
+      let posterURL = null;
+      let cacheCheck = cache.get(movieUserOne.filmSlug);
+      if (cacheCheck) {
+        posterURL = cacheCheck;
+      } else {
+        const filmInfo = await getInfoFromFilmPage(movieUserOne.filmSlug);
+        posterURL = filmInfo[0];
+        cache.set(movieUserOne.filmSlug, posterURL);
+      }
+
+      return {
+        title,
+        posterURL: posterURL,
+        userOneRating: movieUserOne.rating,
+        userTwoRating: movieUserTwo.rating,
+        cache: cache,
+      };
+    }),
+  );
 
   return await Promise.all(promises);
 }
