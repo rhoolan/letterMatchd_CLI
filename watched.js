@@ -89,12 +89,17 @@ async function getLetterboxdWatchlist(username) {
 
 // Compare the two users film lists. :UNIT TESTS DONE
 function compareWatchedLists(userOneList, userTwoList) {
+  // Create a set to store unique shared titles
+  const sharedTitlesSet = new Set();
+
   // Filter userOneList to only films that appear in userTwoList
-  const sharedTitles = userOneList
-    .filter((element1) =>
-      userTwoList.some((element2) => element2.title === element1.title),
-    )
-    .map((element) => element.title);
+  userOneList.forEach((element1) => {
+    if (userTwoList.some((element2) => element2.title === element1.title)) {
+      sharedTitlesSet.add(element1.title);
+    }
+  });
+
+  const sharedTitles = Array.from(sharedTitlesSet);
 
   console.log(`You have ${sharedTitles.length} in common.`);
   return sharedTitles;
@@ -310,6 +315,7 @@ async function main() {
   // Compare the watched lists and make new array of common films
   console.log("Comparing compatibility...");
   const commonFilms = compareWatchedLists(watchListOne, watchListTwo);
+  console.log("common:", commonFilms);
   console.log("Creating output...");
   // Create the output
   let output = await createOutput(
