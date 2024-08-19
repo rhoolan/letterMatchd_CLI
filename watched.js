@@ -79,7 +79,11 @@ async function getLetterboxdWatchlist(username) {
     });
   }
 
-  console.log(`Retrived ${username}'s watched list.`);
+  let filmCount = watchlist.length;
+
+  console.log(
+    `Retrived ${username}'s watched list.\nThere are ${filmCount} films in the list.\n`,
+  );
   return watchlist;
 }
 
@@ -92,6 +96,7 @@ function compareWatchedLists(userOneList, userTwoList) {
     )
     .map((element) => element.title);
 
+  console.log(`You have ${sharedTitles.length} in common.`);
   return sharedTitles;
 }
 
