@@ -336,6 +336,50 @@ describe("compareWatchedLists", () => {
 
     expect(result).toEqual(expectedResults);
   });
+
+  it("should handle duplicates in array one", () => {
+    const userOneList = [{ title: "One" }, { title: "Two" }, { title: "Two" }];
+
+    const userTwoList = [
+      { title: "One" },
+      { title: "Two" },
+      { title: "Three" },
+    ];
+
+    const expectedResults = ["One", "Two"];
+
+    const result = compareWatchedLists(userOneList, userTwoList);
+
+    expect(result).toEqual(expectedResults);
+  });
+
+  it("should handle duplicates in array two", () => {
+    const userOneList = [
+      { title: "One" },
+      { title: "Two" },
+      { title: "Three" },
+    ];
+
+    const userTwoList = [{ title: "One" }, { title: "Two" }, { title: "Two" }];
+
+    const expectedResults = ["One", "Two"];
+
+    const result = compareWatchedLists(userOneList, userTwoList);
+
+    expect(result).toEqual(expectedResults);
+  });
+
+  it("should handle duplicates in both array", () => {
+    const userOneList = [{ title: "One" }, { title: "Two" }, { title: "Two" }];
+
+    const userTwoList = [{ title: "One" }, { title: "Two" }, { title: "Two" }];
+
+    const expectedResults = ["One", "Two"];
+
+    const result = compareWatchedLists(userOneList, userTwoList);
+
+    expect(result).toEqual(expectedResults);
+  });
 });
 
 describe("createOutput", () => {
