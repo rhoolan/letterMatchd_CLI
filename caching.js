@@ -93,7 +93,7 @@ async function writeCacheToFile(filePath, cache, cacheName) {
 }
 
 // Function to read the cache file and populate the cache object with user-user scores
-// {user-user : score : date}
+// {user-user : score}
 async function readInScoresFromFile(filePath, scoreCache) {
   try {
     const data = await fs.readFile(filePath, "utf8");
@@ -103,9 +103,8 @@ async function readInScoresFromFile(filePath, scoreCache) {
       const info = line.split(" : ");
       const userNames = info[0];
       const score = info[1];
-      const date = info[2];
 
-      scoreCache.set(userNames, { score, date });
+      scoreCache.set(userNames, score);
     });
 
     return scoreCache; // Return the cache here
@@ -119,16 +118,14 @@ async function readInScoresFromFile(filePath, scoreCache) {
 // CURRENT STATE JUST WRITES BLANK FILE
 async function writeScoresToFile(filePath, cache, cacheName) {
   try {
-    // Get the Map object from the CacheWithExpiry instance
-    const cacheMap = cache.cache;
     // Get size of cache for tracking if an item is the last or not
-    const size = cacheMap.size;
+    const size = cache.size;
 
     // Prepare the data to write
-    const data = Array.from(cacheMap.entries())
-      .map(([key, { value, expiryDate }], index) => {
+    const data = Array.from(cache.entries())
+      .map(([key, value], index) => {
         // Check if it's the last item, omit the line break
-        return `${key} : ${value} : ${expiryDate}${index !== size - 1 ? "\n" : ""}`;
+        return `${key} : ${value}${index !== size - 1 ? "\n" : ""}`;
       })
       .join("");
 

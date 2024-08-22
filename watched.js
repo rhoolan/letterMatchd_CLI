@@ -207,7 +207,8 @@ function calculateCompatibility(data) {
   let rating = convertCorrelationIntoLabel(score);
 
   // Return the compatibility score and its descriptive word
-  return `\nYour compatibility score is ${score}.\n${rating}`;
+  // return `\nYour compatibility score is ${score}.\n${rating}`;
+  return score;
 }
 
 // Helper function to convert the numerical compatibility score to a descriptive word. UNIT TESTS DONE
@@ -323,6 +324,11 @@ async function main() {
     }
   }
 
+  // Pull and store the userName-userName score from the cache in a var
+  let userKey = userOne + "-" + userTwo;
+  console.log(userKey);
+  let oldUserUserScore = scoreCache.get(userKey);
+
   // Compare the watched lists and make new array of common films
   console.log("Comparing compatibility...");
   const commonFilms = compareWatchedLists(watchListOne, watchListTwo);
@@ -341,10 +347,17 @@ async function main() {
 
   // Print user compatibility compatibility
   console.log("\nCalculating compatibility...");
-  console.log(calculateCompatibility(output));
+  let compatibilityRating = calculateCompatibility(output);
+  console.log("Old rating: ", oldUserUserScore);
+  console.log("New rating: ", compatibilityRating);
+  scoreCache.set(userKey, compatibilityRating);
+  console.log(scoreCache);
 
   // Write cache to TXT file
   await writeCacheToFile(posterCacheFilePath, cache, "Poster cache");
+
+  // Write new scores to cache
+  await writeScoresToFile(scoreCacheFilePath, scoreCache, "Score cache");
 }
 
 if (require.main === module) {
