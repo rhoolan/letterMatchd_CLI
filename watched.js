@@ -6,12 +6,16 @@ const {
   writeCacheToFile,
   CacheWithExpiry,
 } = require("./caching.js");
+const fs = require("fs").promises;
 
 // pMap for handling huge lists
 const pLimit = require("p-limit");
 
 // Cache file path
-const filePath = "./posterURLCache.txt";
+const posterCacheFilePath = "./posterURLCache.txt";
+
+// Score cache file path
+const scoreCacheFilePath = "./scoreCache.txt";
 
 // Get the users watched film page count (Used to limit the number of futures in getLetterBoxdWatchlist). :INTERGRATION TEST NEEDED
 async function getPageCount(username) {
@@ -273,6 +277,54 @@ function convertStarRating(rating) {
   return starMap[rating] || null;
 }
 
+// Function to read the cache file and populate the cache object with user-user scores
+// {user-user : score : date}
+async function readInScoresFromFile(filePath, scoreCache) {
+  try {
+    const data = await fs.readFile(filePath, "utf8");
+    const lines = data.split("\n");
+
+    lines.forEach((line) => {
+      const info = line.split(" : ");
+      const userNames = info[0];
+      const score = info[1];
+      const date = info[2];
+
+      scoreCache.set(userNames, { score, date });
+    });
+
+    return scoreCache; // Return the cache here
+  } catch (error) {
+    console.log("Could not read file:", error);
+    throw error;
+  }
+}
+
+// Function to write the cache to the txt file
+// CURRENT STATE JUST WRITES BLANK FILE
+async function writeScoresToFile(filePath, cache, cacheName) {
+  try {
+    // Get the Map object from the CacheWithExpiry instance
+    const cacheMap = cache.cache;
+    // Get size of cache for tracking if an item is the last or not
+    const size = cacheMap.size;
+
+    // Prepare the data to write
+    const data = Array.from(cacheMap.entries())
+      .map(([key, { value, expiryDate }], index) => {
+        // Check if it's the last item, omit the line break
+        return `${key} : ${value} : ${expiryDate}${index !== size - 1 ? "\n" : ""}`;
+      })
+      .join("");
+
+    // Write all data at once
+    await fs.writeFile(filePath, data, "utf8"); // Specify encoding
+    console.log(`\n${cacheName} data written to cache`);
+  } catch (error) {
+    console.error("Failed to write data to cache:", error);
+  }
+}
+
 // Main function to run the program
 async function main() {
   let userOne = null;
@@ -280,11 +332,17 @@ async function main() {
   let watchListOne = [];
   let watchListTwo = [];
 
-  // Set new catch that uses expiry date
+  // Set new cacje that uses expiry date
   let cache = new CacheWithExpiry();
-
   // Read in cache from TXT file
-  await readInCacheFromFile(filePath, cache);
+  await readInCacheFromFile(posterCacheFilePath, cache);
+
+  // Set new cache for scores. Stores the users last score for comparison reasons
+  // FORMAT: username-username => {score, date}
+  let scoreCache = new Map();
+  // Read in scoreCache from TXT file
+  await readInScoresFromFile(scoreCacheFilePath, scoreCache);
+  console.log(scoreCache);
 
   // Get first user and their watchlist
   while (watchListOne.length === 0) {
@@ -333,7 +391,7 @@ async function main() {
   console.log(calculateCompatibility(output));
 
   // Write cache to TXT file
-  await writeCacheToFile(filePath, cache, "Poster cache");
+  await writeCacheToFile(posterCacheFilePath, cache, "Poster cache");
 }
 
 if (require.main === module) {

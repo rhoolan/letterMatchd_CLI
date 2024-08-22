@@ -369,7 +369,7 @@ describe("compareWatchedLists", () => {
     expect(result).toEqual(expectedResults);
   });
 
-  it("should handle duplicates in both array", () => {
+  it("should handle duplicates in both arrays", () => {
     const userOneList = [{ title: "One" }, { title: "Two" }, { title: "Two" }];
 
     const userTwoList = [{ title: "One" }, { title: "Two" }, { title: "Two" }];
