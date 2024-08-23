@@ -325,7 +325,7 @@ async function main() {
   }
 
   // Pull and store the userName-userName score from the cache in a var
-  let userKey = userOne + "-" + userTwo;
+  let userKey = [userOne, userTwo].sort().join("-");
   console.log(userKey);
   let oldUserUserScore = scoreCache.get(userKey);
 
@@ -356,7 +356,7 @@ async function main() {
   // Write cache to TXT file
   await writeCacheToFile(posterCacheFilePath, cache, "Poster cache");
 
-  // Write new scores to cache
+  // Write new scores to TXT file
   await writeScoresToFile(scoreCacheFilePath, scoreCache, "Score cache");
 }
 
