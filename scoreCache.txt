@@ -11,3 +11,7 @@ fumilayo-furafura : -0.12
 fumilayo-kyru14 : 0.06
 fumilayo-fumilayo : 1
 flanaganfilm-flanaganfilm : 0
+jing2726-kyru14 : 0.47
+furafura-jing2726 : 0.36
+kyru14-pikarada : 0.26
+furafura-pikarada : 0.5
