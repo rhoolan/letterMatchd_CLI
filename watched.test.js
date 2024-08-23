@@ -582,7 +582,8 @@ describe("calculateCompatibility", () => {
 
     const result = calculateCompatibility(data);
 
-    const expectedResult = `\nYour compatibility score is 0.25.\nMild Overlap: Limited common ground in preferences.`;
+    const expectedResult = 0.25;
+
     expect(result).toEqual(expectedResult);
   });
 
@@ -622,7 +623,7 @@ describe("calculateCompatibility", () => {
 
     const result = calculateCompatibility(data);
 
-    const expectedResult = `\nYour compatibility score is 0.25.\nMild Overlap: Limited common ground in preferences.`;
+    const expectedResult = 0.25;
     expect(result).toEqual(expectedResult);
   });
 });

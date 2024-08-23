@@ -203,9 +203,6 @@ function calculateCompatibility(data) {
   // Convert to two decimal places for easier viewing
   let score = Math.round(rawScore * 100) / 100;
 
-  // Convert the numerical compatibility score to a descriptive word
-  let rating = convertCorrelationIntoLabel(score);
-
   // Return the compatibility score and its descriptive word
   // return `\nYour compatibility score is ${score}.\n${rating}`;
   return score;
