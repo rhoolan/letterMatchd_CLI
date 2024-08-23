@@ -1,2 +1,4 @@
 furafura-kyru14 : 0.47
 furafura-punq : 0.24
+furafura-furafura : 1
+kyru14-kyru14 : 1

@@ -279,6 +279,21 @@ function convertStarRating(rating) {
   return starMap[rating] || null;
 }
 
+// Print results of new and old userUser score comparison
+function compareScores(newScore, oldScore) {
+  if (newScore === oldScore) {
+    console.log("Your compatibility score hasn't changed since last time.");
+  } else if (newScore > oldScore) {
+    console.log(
+      `Your compatibiliity score has improved by ${newScore - oldScore} points since last time.`,
+    );
+  } else if (oldScore > newScore) {
+    console.log(
+      `Your compatibiliity score has dropped by ${oldScore - newScore} points since last time.`,
+    );
+  }
+}
+
 // Main function to run the program
 async function main() {
   let userOne = null;
@@ -346,19 +361,11 @@ async function main() {
   console.log("\nCalculating compatibility...");
   let compatibilityRating = calculateCompatibility(output);
   console.log("Compatibility score: ", compatibilityRating);
-  console.log("Old Compatibility score: ", oldUserUserScore);
-  // Print results of new and old userUser score comparison
-  if (compatibilityRating === oldUserUserScore) {
-    console.log("Your compatibility score hasn't changed since last time.");
-  } else if (compatibilityRating > oldUserUserScore) {
-    console.log(
-      `Your compatibiliity score has improved by ${compatibilityRating - oldUserUserScore} points since last time.`,
-    );
-  } else if (compatibilityRating > compatibilityRating) {
-    console.log(
-      `Your compatibiliity score has dropped by ${oldUserUserScore - compatibilityRating} points since last time.`,
-    );
+  if (oldUserUserScore !== undefined) {
+    console.log("Old Compatibility score:", oldUserUserScore);
   }
+  compareScores(compatibilityRating, oldUserUserScore);
+
   // Save new userUser score to cache
   scoreCache.set(userKey, compatibilityRating);
 
