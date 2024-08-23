@@ -102,7 +102,7 @@ async function readInScoresFromFile(filePath, scoreCache) {
     lines.forEach((line) => {
       const info = line.split(" : ");
       const userNames = info[0];
-      const score = info[1];
+      const score = parseFloat(info[1]);
 
       scoreCache.set(userNames, score);
     });

@@ -296,7 +296,6 @@ async function main() {
   let scoreCache = new Map();
   // Read in scoreCache from TXT file
   await readInScoresFromFile(scoreCacheFilePath, scoreCache);
-  console.log(scoreCache);
 
   // Get first user and their watchlist
   while (watchListOne.length === 0) {
@@ -326,13 +325,11 @@ async function main() {
 
   // Pull and store the userName-userName score from the cache in a var
   let userKey = [userOne, userTwo].sort().join("-");
-  console.log(userKey);
   let oldUserUserScore = scoreCache.get(userKey);
 
   // Compare the watched lists and make new array of common films
   console.log("Comparing compatibility...");
   const commonFilms = compareWatchedLists(watchListOne, watchListTwo);
-  console.log("common:", commonFilms);
   console.log("Creating output...");
   // Create the output
   let output = await createOutput(
@@ -348,10 +345,22 @@ async function main() {
   // Print user compatibility compatibility
   console.log("\nCalculating compatibility...");
   let compatibilityRating = calculateCompatibility(output);
-  console.log("Old rating: ", oldUserUserScore);
-  console.log("New rating: ", compatibilityRating);
+  console.log("Compatibility score: ", compatibilityRating);
+  console.log("Old Compatibility score: ", oldUserUserScore);
+  // Print results of new and old userUser score comparison
+  if (compatibilityRating === oldUserUserScore) {
+    console.log("Your compatibility score hasn't changed since last time.");
+  } else if (compatibilityRating > oldUserUserScore) {
+    console.log(
+      `Your compatibiliity score has improved by ${compatibilityRating - oldUserUserScore} points since last time.`,
+    );
+  } else if (compatibilityRating > compatibilityRating) {
+    console.log(
+      `Your compatibiliity score has dropped by ${oldUserUserScore - compatibilityRating} points since last time.`,
+    );
+  }
+  // Save new userUser score to cache
   scoreCache.set(userKey, compatibilityRating);
-  console.log(scoreCache);
 
   // Write cache to TXT file
   await writeCacheToFile(posterCacheFilePath, cache, "Poster cache");
