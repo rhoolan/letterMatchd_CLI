@@ -358,11 +358,15 @@ async function main() {
   console.log("\nCalculating compatibility...");
   let compatibilityRating = calculateCompatibility(output);
   console.log("Compatibility score: ", compatibilityRating);
+  console.log(convertCorrelationIntoLabel(compatibilityRating), "\n");
+
+  // Compare and display the users' current and past compatibility score
+  // !== hanldles if it is the first score for the user combo
   if (oldUserUserScore !== undefined) {
     console.log("Old Compatibility score:", oldUserUserScore);
+    let comparison = compareScores(compatibilityRating, oldUserUserScore);
+    console.log(comparison);
   }
-  let comparison = compareScores(compatibilityRating, oldUserUserScore);
-  console.log(comparison);
 
   // Save new userUser score to cache
   scoreCache.set(userKey, compatibilityRating);

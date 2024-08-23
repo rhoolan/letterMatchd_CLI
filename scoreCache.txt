@@ -2,3 +2,12 @@ furafura-kyru14 : 0.47
 furafura-punq : 0.24
 furafura-furafura : 1
 kyru14-kyru14 : 1
+kyru14-punq : 0.21
+jay-kyru14 : 0.28
+furafura-jay : 0.35
+furafura-mscorsese : 0
+kyru14-mscorsese : 0
+fumilayo-furafura : -0.12
+fumilayo-kyru14 : 0.06
+fumilayo-fumilayo : 1
+flanaganfilm-flanaganfilm : 0
