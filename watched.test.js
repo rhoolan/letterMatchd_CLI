@@ -5,9 +5,11 @@ const {
   createOutput,
   printOutput,
   calculateCompatibility,
+  compareScores,
 } = require("./watched");
 
 const { getInfoFromFilmPage } = require("./sharedFunctions");
+const { describe } = require("node:test");
 
 jest.mock("./sharedFunctions", () => ({
   getInfoFromFilmPage: jest.fn(),
@@ -621,6 +623,44 @@ describe("calculateCompatibility", () => {
     const result = calculateCompatibility(data);
 
     const expectedResult = `\nYour compatibility score is 0.25.\nMild Overlap: Limited common ground in preferences.`;
+    expect(result).toEqual(expectedResult);
+  });
+});
+
+describe("compareScores", () => {
+  it("Should correctly handle equal scores", () => {
+    let newScore = 1;
+    let oldScore = 1;
+
+    let expectedResult =
+      "Your compatibility score hasn't changed since last time.";
+
+    let result = compareScores(newScore, oldScore);
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it("Should correctly handle a higher new score", () => {
+    let newScore = 1;
+    let oldScore = 0.5;
+
+    let expectedResult =
+      "Your compatibiliity score has improved by 0.5 points since last time.";
+
+    let result = compareScores(newScore, oldScore);
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it("Should correctly handle a higher old score", () => {
+    let newScore = 0.5;
+    let oldScore = 1;
+
+    let expectedResult =
+      "Your compatibiliity score has dropped by 0.5 points since last time.";
+
+    let result = compareScores(newScore, oldScore);
+
     expect(result).toEqual(expectedResult);
   });
 });

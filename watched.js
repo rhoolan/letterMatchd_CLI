@@ -281,17 +281,17 @@ function convertStarRating(rating) {
 
 // Print results of new and old userUser score comparison
 function compareScores(newScore, oldScore) {
+  let message = null;
+
   if (newScore === oldScore) {
-    console.log("Your compatibility score hasn't changed since last time.");
+    message = "Your compatibility score hasn't changed since last time.";
   } else if (newScore > oldScore) {
-    console.log(
-      `Your compatibiliity score has improved by ${newScore - oldScore} points since last time.`,
-    );
+    message = `Your compatibiliity score has improved by ${newScore - oldScore} points since last time.`;
   } else if (oldScore > newScore) {
-    console.log(
-      `Your compatibiliity score has dropped by ${oldScore - newScore} points since last time.`,
-    );
+    message = `Your compatibiliity score has dropped by ${oldScore - newScore} points since last time.`;
   }
+
+  return message;
 }
 
 // Main function to run the program
@@ -364,7 +364,8 @@ async function main() {
   if (oldUserUserScore !== undefined) {
     console.log("Old Compatibility score:", oldUserUserScore);
   }
-  compareScores(compatibilityRating, oldUserUserScore);
+  let comparison = compareScores(compatibilityRating, oldUserUserScore);
+  console.log(comparison);
 
   // Save new userUser score to cache
   scoreCache.set(userKey, compatibilityRating);
@@ -387,4 +388,5 @@ module.exports = {
   createOutput,
   printOutput,
   calculateCompatibility,
+  compareScores,
 };
