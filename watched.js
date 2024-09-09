@@ -357,13 +357,9 @@ async function runCode(userOne, userTwo) {
 
 // Main function to run the program
 async function main() {
-
-
-
-
-
-
-
+    userOne = prompt("Enter the first user's Letterboxd username: ").trim();
+    userTwo = prompt("Enter the second user's Letterboxd username: ").trim();
+    runCode(userOne, userTwo);
 }
 
 if (require.main === module) {
