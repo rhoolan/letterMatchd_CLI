@@ -291,14 +291,11 @@ function compareScores(newScore, oldScore) {
   return message;
 }
 
-// Main function to run the program
-async function main() {
-  let userOne = null;
-  let userTwo = null;
+async function runCode(userOne, userTwo) {
   let watchListOne = [];
   let watchListTwo = [];
 
-  // Set new cacje that uses expiry date
+  // Set new cache that uses expiry date
   let cache = new CacheWithExpiry();
   // Read in cache from TXT file
   await readInCacheFromFile(posterCacheFilePath, cache);
@@ -309,31 +306,9 @@ async function main() {
   // Read in scoreCache from TXT file
   await readInScoresFromFile(scoreCacheFilePath, scoreCache);
 
-  // Get first user and their watchlist
-  while (watchListOne.length === 0) {
-    userOne = prompt("Enter the first user's Letterboxd username: ").trim();
-    console.log(`Getting ${userOne}'s watched list...`);
-    watchListOne = await getLetterboxdWatchlist(userOne);
-    if (watchListOne.length === 0) {
-      console.log(
-        `Either this user does not exist or they haven't watched any movies \nPlease try another user`,
-      );
-      userOne = null;
-    }
-  }
-
-  // Get second user and their watchlist
-  while (watchListTwo.length === 0) {
-    userTwo = prompt("Enter the second user's Letterboxd username: ").trim();
-    console.log(`Getting ${userTwo}'s watched list...`);
-    watchListTwo = await getLetterboxdWatchlist(userTwo);
-    if (watchListTwo.length === 0) {
-      console.log(
-        `Either this user does not exist or they haven't watched any movies \nPlease try another user`,
-      );
-      userTwo = null;
-    }
-  }
+  // Get user watchlists 
+  watchListOne = await getLetterboxdWatchlist(userOne);
+  watchListTwo = await getLetterboxdWatchlist(userTwo);
 
   // Pull and store the userName-userName score from the cache in a var
   let userKey = [userOne, userTwo].sort().join("-");
@@ -376,6 +351,19 @@ async function main() {
 
   // Write new scores to TXT file
   await writeScoresToFile(scoreCacheFilePath, scoreCache, "Score cache");
+
+  
+}
+
+// Main function to run the program
+async function main() {
+
+
+
+
+
+
+
 }
 
 if (require.main === module) {
